@@ -3,6 +3,7 @@ import cors from 'cors';
 import pool from './db/pool';
 import migrate from './db/migrate';
 import taskRoutes from './routes/tasks';
+import statsRoutes from './routes/stats';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
@@ -20,6 +21,7 @@ app.get('/health', async (_req, res) => {
 });
 
 app.use('/api/tasks', taskRoutes);
+app.use('/api/stats', statsRoutes);
 
 app.use('/api', (_req, res) => {
   res.status(404).json({ error: 'Resource not found' });
