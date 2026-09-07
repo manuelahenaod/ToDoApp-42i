@@ -6,9 +6,6 @@ async function migrate() {
   const schemaPath = path.join(__dirname, 'schema.sql');
   const schema = fs.readFileSync(schemaPath, 'utf-8');
 
-  await pool.query('DROP TYPE IF EXISTS task_status CASCADE;');
-  await pool.query('DROP TYPE IF EXISTS task_priority CASCADE;');
-
   await pool.query(schema);
   console.log('Database migrated successfully');
 }

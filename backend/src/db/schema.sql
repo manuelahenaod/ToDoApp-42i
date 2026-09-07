@@ -1,8 +1,15 @@
 -- ==========================
 --    Tasks table
 -- ==========================
-CREATE TYPE task_status AS ENUM ('todo', 'in_progress', 'done');
-CREATE TYPE task_priority AS ENUM ('low', 'medium', 'high', 'critical');
+DO $$ BEGIN
+  CREATE TYPE task_status AS ENUM ('todo', 'in_progress', 'done');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE task_priority AS ENUM ('low', 'medium', 'high', 'critical');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 CREATE TABLE IF NOT EXISTS tasks (
   id              SERIAL PRIMARY KEY,
