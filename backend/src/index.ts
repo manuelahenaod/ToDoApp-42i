@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import pool from './db/pool';
 import migrate from './db/migrate';
+import taskRoutes from './routes/tasks';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
@@ -17,6 +18,21 @@ app.get('/health', async (_req, res) => {
     res.status(503).json({ status: 'error', database: 'disconnected' });
   }
 });
+
+app.use('/api/tasks', taskRoutes);
+
+app.use('/api', (_req, res) => {
+  res.status(404).json({ error: 'Resource not found' });
+});
+
+// Central error handler
+app.use(
+  (err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    const status = Number(err.status) || 500;
+    if (status >= 500) console.error(err);
+    res.status(status).json({ error: err.message || 'Internal Server Error' });
+  }
+);
 
 async function start() {
   await migrate();
