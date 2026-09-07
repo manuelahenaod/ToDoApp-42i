@@ -1,0 +1,20 @@
+.badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.badge--todo { background: var(--todo-bg); color: var(--todo-text); }
+.badge--in_progress { background: var(--prog-bg); color: var(--prog-text); }
+.badge--done { background: var(--done-bg); color: var(--done-text); }
+
+.badge--prio-low { background: var(--color-surface); color: var(--color-muted); }
+.badge--prio-medium { background: var(--prog-bg); color: var(--prog-text); }
+.badge--prio-high { background: var(--color-primary-lighter); color: var(--color-primary); }
+.badge--prio-critical { background: var(--crit-bg); color: var(--crit-text); }

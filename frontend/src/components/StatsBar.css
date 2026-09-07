@@ -1,0 +1,76 @@
+.stats {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+
+.stats-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.stat { text-align: center; }
+
+.stat-value {
+  font-family: var(--sora);
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: -0.5px;
+}
+
+.stat--todo .stat-value { color: var(--color-ink); }
+.stat--progress .stat-value { color: var(--color-primary); }
+.stat--done .stat-value { color: var(--done-text); }
+
+.stat-label {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--color-muted);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.bar-stacked {
+  display: flex;
+  gap: 2px;
+  height: 10px;
+  background: var(--color-surface);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.seg { height: 100%; border-radius: 999px; }
+
+.seg--todo { background: #c3c3cc; }
+.seg--progress { background: var(--color-primary); }
+.seg--done { background: #22c55e; }
+
+/* ============ TABLET ============ */
+@media (min-width: 768px) {
+  .stats { padding: 18px; }
+  .stat-value { font-size: 26px; }
+  .stat-label { font-size: 11px; }
+  .bar-stacked { height: 14px; }
+}
+
+/* ============ DESKTOP ============ */
+@media (min-width: 1024px) {
+  .stats { padding: 22px; border-radius: 14px; }
+  .stat-value { font-size: 30px; }
+  .stat-label { font-size: 12px; }
+  .bar-stacked { height: 18px; }
+}
+
+/* ============ WIDESCREEN ============ */
+@media (min-width: 1280px) {
+  .stats { padding: 26px; }
+  .stat-value { font-size: 34px; }
+  .stat-label { font-size: 13px; }
+  .bar-stacked { height: 22px; }
+}
