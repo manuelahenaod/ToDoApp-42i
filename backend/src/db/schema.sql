@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS tasks (
   description     TEXT DEFAULT '',
   status          task_status NOT NULL DEFAULT 'todo',
   priority        task_priority NOT NULL DEFAULT 'medium',
-  effort_estimate NUMERIC(10,2) CHECK (effort_estimate >= 0),
+  effort_estimate INTEGER CHECK (effort_estimate >= 0),
   parent_id       INTEGER REFERENCES tasks(id) ON DELETE CASCADE,
   created_at      TIMESTAMPTZ DEFAULT NOW(),
   updated_at      TIMESTAMPTZ DEFAULT NOW()
