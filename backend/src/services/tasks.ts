@@ -27,12 +27,8 @@ export interface ListTasksFilters {
 }
 
 export interface ListTasksResult {
-  tasks: TaskListItem[];
+  tasks: TaskNode[];
   total: number;
-}
-
-export interface TaskListItem extends TaskNode {
-  total_effort: number;
 }
 
 export interface TaskDetail extends TaskNode {
@@ -187,6 +183,15 @@ export function eachSubtreeEffort(tasks: Task[]): Map<number, number> {
   return result;
 }
 
+// Stamps total_effort on every node (a task's rollup considered for its whole subtree)
+export function stampEffort(nodes: TaskNode[], effort: Map<number, number>): TaskNode[] {
+  for (const node of nodes) {
+    node.total_effort = effort.get(node.id) ?? 0;
+    stampEffort(node.subtasks, effort);
+  }
+  return nodes;
+}
+
 // ---------- list queries (filters, sort, pagination in JS) ----------
 
 export function prepareTaskList(
@@ -197,15 +202,17 @@ export function prepareTaskList(
   const priority = validatePriority(filters.priority);
 
   const effort = eachSubtreeEffort(all);
-  const roots = buildTree(all);
+  const roots = stampEffort(buildTree(all), effort);
 
   let filtered = roots;
   if (status) filtered = filtered.filter((r) => r.status === status);
   if (priority) filtered = filtered.filter((r) => r.priority === priority);
 
   const rank: Record<TaskPriority, number> = { critical: 0, high: 1, medium: 2, low: 3 };
+  const byDate = (a: Task, b: Task) =>
+    new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
   filtered.sort(
-    (a, b) => rank[a.priority] - rank[b.priority] || a.created_at.localeCompare(b.created_at)
+    (a, b) => rank[a.priority] - rank[b.priority] || byDate(a, b)
   );
 
   const total = filtered.length;
@@ -213,10 +220,7 @@ export function prepareTaskList(
   const limit = Math.min(100, Math.max(1, filters.limit ?? 50));
   const start = (page - 1) * limit;
 
-  const tasks = filtered.slice(start, start + limit).map((r) => ({
-    ...r,
-    total_effort: effort.get(r.id) ?? 0,
-  }));
+  const tasks = filtered.slice(start, start + limit);
 
   return { tasks, total };
 }
@@ -262,11 +266,11 @@ export async function createSubtask(
 }
 
 export async function getTask(id: number): Promise<TaskDetail> {
-  const existing = await requireTask(id);
-  void existing;
+  await requireTask(id);
   const { rows } = await pool.query('SELECT * FROM tasks');
-  const node = buildSubtree(rows, id);
-  return { ...node!, effort: aggregateEffort(flattenNode(node!)) };
+  const effort = eachSubtreeEffort(rows);
+  const node = stampEffort([buildSubtree(rows, id)!], effort)[0];
+  return { ...node, effort: aggregateEffort(flattenNode(node)) };
 }
 
 export async function listTasks(filters?: ListTasksFilters): Promise<ListTasksResult> {
