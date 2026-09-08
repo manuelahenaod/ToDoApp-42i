@@ -2,22 +2,18 @@ import pool from '../db/pool';
 import { NotFoundError, ValidationError } from './errors';
 import type {
   CreateTaskInput,
+  EffortStats,
   Task,
+  TaskDetail,
   TaskNode,
   TaskPriority,
   TaskStatus,
+  TaskSummary,
   UpdateTaskInput,
 } from '../types';
 
 const VALID_STATUSES: TaskStatus[] = ['todo', 'in_progress', 'done'];
 const VALID_PRIORITIES: TaskPriority[] = ['low', 'medium', 'high', 'critical'];
-
-export interface EffortStats {
-  todo: number;
-  in_progress: number;
-  done: number;
-  total: number;
-}
 
 export interface ListTasksFilters {
   status?: TaskStatus;
@@ -29,10 +25,6 @@ export interface ListTasksFilters {
 export interface ListTasksResult {
   tasks: TaskNode[];
   total: number;
-}
-
-export interface TaskDetail extends TaskNode {
-  effort: EffortStats;
 }
 
 // ---------- validation ----------
@@ -286,9 +278,23 @@ export async function createSubtask(
 export async function getTask(id: number): Promise<TaskDetail> {
   await requireTask(id);
   const { rows } = await pool.query('SELECT * FROM tasks');
+
+  const byId = new Map<number, Task>();
+  for (const row of rows) byId.set(row.id, row);
+
+  const parents: TaskSummary[] = [];
+  let cursor = byId.get(id)?.parent_id ?? null;
+  while (cursor !== null) {
+    const parent = byId.get(cursor);
+    if (!parent) break;
+    parents.push({ id: parent.id, title: parent.title });
+    cursor = parent.parent_id;
+  }
+  parents.reverse();
+
   const effort = eachSubtreeEffort(rows);
   const node = stampStatus(stampEffort([buildSubtree(rows, id)!], effort))[0];
-  return { ...node, effort: aggregateEffort(flattenNode(node)) };
+  return { ...node, effort: aggregateEffort(flattenNode(node)), parents };
 }
 
 export async function listTasks(filters?: ListTasksFilters): Promise<ListTasksResult> {

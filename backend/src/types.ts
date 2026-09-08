@@ -18,6 +18,23 @@ export interface TaskNode extends Task {
   total_effort?: number;
 }
 
+export interface TaskSummary {
+  id: number;
+  title: string;
+}
+
+export interface EffortStats {
+  todo: number;
+  in_progress: number;
+  done: number;
+  total: number;
+}
+
+export interface TaskDetail extends TaskNode {
+  effort: EffortStats;
+  parents: TaskSummary[];
+}
+
 export interface CreateTaskInput {
   title: string;
   description?: string;
