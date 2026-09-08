@@ -1,7 +1,9 @@
 .modal-scrim {
   position: fixed;
   inset: 0;
-  background: rgba(28, 27, 31, 0.45);
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   z-index: 60;
   display: flex;
   align-items: center;
@@ -11,86 +13,124 @@
 
 .task-form {
   background: var(--color-white);
-  border-radius: 12px;
-  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
   width: 100%;
-  max-width: 420px;
+  max-width: 440px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 8px 30px rgba(28, 27, 31, 0.2);
+  box-shadow: var(--shadow-md);
 }
 
 .task-form-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.task-form-head h3 {
+  font-size: 17px;
+  font-weight: 700;
+  font-family: var(--sora);
+  color: var(--color-ink);
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--color-muted);
+  transition: all 0.15s ease;
+}
+
+.modal-close:hover {
+  background: var(--color-surface);
+  color: var(--color-ink);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   margin-bottom: 16px;
 }
 
-.task-form-head h3 { font-size: 17px; font-weight: 600; font-family: var(--sora); }
-
-.modal-close {
-  background: none;
-  border: none;
-  font-size: 22px;
-  line-height: 1;
-  cursor: pointer;
-  color: var(--color-muted);
-  padding: 2px 8px;
-  border-radius: 6px;
+.field > span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-ink-2);
 }
-
-.modal-close:hover { background: var(--color-surface); color: var(--color-ink); }
-
-.field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
-
-.field > span { font-size: 12px; font-weight: 500; color: var(--color-ink-2); }
 
 .field input,
 .field select,
 .field textarea {
-  padding: 9px 11px;
+  padding: 10px 14px;
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   font-size: 14px;
-  color: var(--color-ink-2);
+  font-family: var(--inter);
+  color: var(--color-ink);
   background: var(--color-white);
-  resize: vertical;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .field input:focus,
 .field select:focus,
 .field textarea:focus {
-  outline: 2px solid var(--color-primary-lighter);
+  outline: none;
   border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
 }
 
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
 
 .form-error {
   background: var(--crit-bg);
   color: var(--crit-text);
   font-size: 13px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  margin-bottom: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+  font-weight: 500;
 }
 
 .task-form-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  margin-top: 8px;
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
 }
 
 .btn-secondary {
   background: var(--color-white);
   color: var(--color-ink-2);
   border: 1px solid var(--color-border);
-  padding: 9px 16px;
-  border-radius: 8px;
+  padding: 0 16px;
+  height: 36px;
+  border-radius: var(--radius-sm);
   font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.15s ease;
 }
 
-.btn-secondary:hover { background: var(--color-surface); }
+.btn-secondary:hover {
+  background: var(--color-surface);
+  color: var(--color-ink);
+}

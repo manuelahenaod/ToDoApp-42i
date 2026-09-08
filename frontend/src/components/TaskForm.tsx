@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
+import { X } from 'lucide-react';
 import type { CreateTaskInput, TaskPriority } from '../types/task';
 import './TaskForm.css';
 
@@ -64,19 +65,21 @@ export default function TaskForm({
   }
 
   return (
-    <div className="modal-scrim" onClick={onClose}>
+    <div className="modal-scrim animate-fade-in" onClick={onClose}>
       <form className="task-form" onClick={(e) => e.stopPropagation()} onSubmit={handleSubmit}>
         <div className="task-form-head">
           <h3>{title}</h3>
-          <button type="button" className="modal-close" onClick={onClose} aria-label="Close">×</button>
+          <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
+            <X size={18} />
+          </button>
         </div>
 
         <label className="field">
-          <span>Title</span>
+          <span>Title *</span>
           <input
             value={form.title}
             onChange={(e) => set('title', e.target.value)}
-            placeholder="e.g. Build login"
+            placeholder="e.g. Build login API endpoint"
             autoFocus
           />
         </label>
@@ -86,7 +89,7 @@ export default function TaskForm({
           <textarea
             value={form.description}
             onChange={(e) => set('description', e.target.value)}
-            placeholder="Optional details…"
+            placeholder="Add relevant task details or context…"
             rows={3}
           />
         </label>
@@ -96,28 +99,32 @@ export default function TaskForm({
             <span>Priority</span>
             <select value={form.priority} onChange={(e) => set('priority', e.target.value as TaskPriority)}>
               {PRIORITIES.map((p) => (
-                <option key={p} value={p}>{p}</option>
+                <option key={p} value={p}>
+                  {p.charAt(0).toUpperCase() + p.slice(1)}
+                </option>
               ))}
             </select>
           </label>
-        </div>
 
-        <label className="field">
-          <span>Effort estimate </span>
-          <input
-            type="number"
-            min="0"
-            step="1"
-            value={form.effort}
-            onChange={(e) => set('effort', e.target.value)}
-            placeholder="Optional"
-          />
-        </label>
+          <label className="field">
+            <span>Effort estimate</span>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              value={form.effort}
+              onChange={(e) => set('effort', e.target.value)}
+              placeholder="e.g. 5"
+            />
+          </label>
+        </div>
 
         {error && <div className="form-error">{error}</div>}
 
         <div className="task-form-actions">
-          <button type="button" className="btn-secondary" onClick={onClose}>Cancel</button>
+          <button type="button" className="btn-secondary" onClick={onClose}>
+            Cancel
+          </button>
           <button type="submit" className="btn-primary" disabled={saving}>
             {saving ? 'Saving…' : submitLabel}
           </button>
