@@ -1,4 +1,4 @@
-import type { TaskPriority, TaskStatus } from './types/task';
+import type { TaskPriority, TaskStatus } from './task';
 
 export const STATUS_LABELS: Record<TaskStatus, string> = {
   todo: 'To do',

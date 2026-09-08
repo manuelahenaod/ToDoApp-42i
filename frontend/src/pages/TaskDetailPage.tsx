@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, ChevronDown, ChevronRight, Pencil, Plus, Trash2, Zap } from 'lucide-react';
 import { createSubtask, deleteTask, getTask, updateTask } from '../api/task';
 import { PriorityBadge, StatusBadge } from '../components/Badge';
-import { STATUS_LABELS } from '../labels';
+import { STATUS_LABELS } from '../types/labels';
 import ProgressBar from '../components/ProgressBar';
 import TaskForm from '../components/TaskForm';
 import ConfirmModal from '../components/ConfirmModal';

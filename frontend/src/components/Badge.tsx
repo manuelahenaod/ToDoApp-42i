@@ -1,4 +1,4 @@
-import { PRIORITY_LABELS, STATUS_LABELS } from '../labels';
+import { PRIORITY_LABELS, STATUS_LABELS } from '../types/labels';
 import type { TaskPriority, TaskStatus } from '../types/task';
 import './Badge.css';
 
