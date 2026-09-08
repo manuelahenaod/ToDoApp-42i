@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Plus, Layers, ChevronRight, Zap, CheckCircle2, CircleDot, Clock } from 'lucide-react';
 import { listTasks } from '../api/task';
 import type { ListResult, TaskNode, TaskStatus } from '../types/task';
 import { PriorityTag } from './Badge';
 import ProgressBar from './ProgressBar';
 import './TaskBoard.css';
 
-const COLUMNS: { id: TaskStatus; label: string }[] = [
-  { id: 'todo', label: 'To do' },
-  { id: 'in_progress', label: 'In progress' },
-  { id: 'done', label: 'Done' },
+const COLUMNS: { id: TaskStatus; label: string; icon: typeof CircleDot }[] = [
+  { id: 'todo', label: 'To do', icon: CircleDot },
+  { id: 'in_progress', label: 'In progress', icon: Clock },
+  { id: 'done', label: 'Done', icon: CheckCircle2 },
 ];
 
 const INITIAL_LIMIT = 4;
@@ -61,15 +62,20 @@ export default function TaskBoard({ refreshKey, onAddSubtask }: TaskBoardProps) 
 
   return (
     <div className="board">
-      {COLUMNS.map(({ id, label }) => {
+      {COLUMNS.map(({ id, label, icon: StatusIcon }) => {
         const column = columns[id];
         const shown = limits[id];
         const hasMore = column.total > shown;
         const isExpanded = shown > INITIAL_LIMIT;
         return (
-          <section key={id} className="column">
-            <header className={`column-head column-head--${id}`}>
-              <span className="column-title">{label}</span>
+          <section key={id} className={`column column--${id}`}>
+            <header className="column-head">
+              <div className="column-head-left">
+                <span className={`status-icon icon--${id}`}>
+                  <StatusIcon size={14} />
+                </span>
+                <h2 className="column-title">{label}</h2>
+              </div>
               <span className={`column-count count--${id}`}>{column.total}</span>
             </header>
 
@@ -87,12 +93,13 @@ export default function TaskBoard({ refreshKey, onAddSubtask }: TaskBoardProps) 
                 <div className="column-actions">
                   {hasMore && (
                     <button type="button" className="load-more" onClick={() => loadMore(id)}>
-                      + Load more
+                      <Plus size={14} />
+                      <span>Load more</span>
                     </button>
                   )}
                   {isExpanded && (
                     <button type="button" className="show-less" onClick={() => setLimits((l) => ({ ...l, [id]: INITIAL_LIMIT }))}>
-                      – Show less
+                      Show less
                     </button>
                   )}
                 </div>
@@ -119,36 +126,49 @@ function BoardCard({
 
   return (
     <article className={`card card--prio-${node.priority}${isDone ? ' card--done' : ''}`} onClick={onOpen}>
-      <h3 className="card-title">{node.title}</h3>
-      {node.description && <p className="card-desc">{node.description}</p>}
-
-      <div className="card-mid">
-        <div className="card-prio">
-          <PriorityTag priority={node.priority} />
-        </div>
-        <ProgressBar node={node} />
+      <div className="card-top">
+        <h3 className="card-title">{node.title}</h3>
+        <PriorityTag priority={node.priority} />
       </div>
 
+      {node.description && <p className="card-desc">{node.description}</p>}
+
+      <ProgressBar node={node} />
+
       <footer className="card-foot">
-        {node.subtasks.length > 0 ? (
-          <Link className="card-subtasks" to={`/tasks/${node.id}`} onClick={(e) => e.stopPropagation()}>
-            {node.subtasks.length} subtareas →
-          </Link>
-        ) : (
-          <span className="card-subtasks card-subtasks--none">0 subtareas</span>
+        <div className="card-subtasks-wrapper">
+          {node.subtasks.length > 0 ? (
+            <Link className="card-subtasks" to={`/tasks/${node.id}`} onClick={(e) => e.stopPropagation()}>
+              <Layers size={13} />
+              <span>{node.subtasks.length} subtask{node.subtasks.length > 1 ? 's' : ''}</span>
+              <ChevronRight size={12} />
+            </Link>
+          ) : (
+            <span className="card-subtasks card-subtasks--none">
+              <Layers size={13} />
+              <span>0 subtasks</span>
+            </span>
+          )}
+          <button
+            type="button"
+            className="icon-btn"
+            aria-label="Add subtask"
+            title="Add subtask"
+            onClick={(e) => {
+              e.stopPropagation();
+              onAddSubtask(node);
+            }}
+          >
+            <Plus size={13} />
+          </button>
+        </div>
+
+        {effort > 0 && (
+          <span className="card-effort" title="Effort estimate">
+            <Zap size={12} />
+            <span>{effort}</span>
+          </span>
         )}
-        <button
-          type="button"
-          className="icon-btn"
-          aria-label="Add subtask"
-          onClick={(e) => {
-            e.stopPropagation();
-            onAddSubtask(node);
-          }}
-        >
-          +
-        </button>
-        <span className="card-effort">{effort}</span>
       </footer>
     </article>
   );
