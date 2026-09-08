@@ -43,7 +43,7 @@
   --shadow-md: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
   --shadow-lift: 0 12px 24px -4px rgba(79, 70, 229, 0.15);
 
-  --sora: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --headings: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   --inter: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
@@ -104,7 +104,7 @@ a:hover { text-decoration: underline; }
 
 button { font-family: var(--inter); }
 
-h1, h2, h3, .font-sora { font-family: var(--sora); letter-spacing: -0.02em; }
+h1, h2, h3, .font-headings { font-family: var(--headings); letter-spacing: -0.02em; }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -114,8 +114,8 @@ h1, h2, h3, .font-sora { font-family: var(--sora); letter-spacing: -0.02em; }
 
 /* Animation Keyframes */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .animate-fade-in {

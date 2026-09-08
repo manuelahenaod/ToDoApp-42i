@@ -62,7 +62,7 @@
 .icon--done { background: var(--done-bg); color: var(--done-text); }
 
 .column-title {
-  font-family: var(--sora);
+  font-family: var(--headings);
   font-weight: 700;
   font-size: 14px;
   color: var(--color-ink);
@@ -70,7 +70,7 @@
 }
 
 .column-count {
-  font-family: var(--sora);
+  font-family: var(--headings);
   font-weight: 700;
   font-size: 11px;
   padding: 2px 8px;
@@ -145,7 +145,7 @@
 }
 
 .card-title {
-  font-family: var(--sora);
+  font-family: var(--headings);
   font-weight: 700;
   font-size: 14px;
   color: var(--color-ink);
@@ -233,7 +233,7 @@
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  font-family: var(--sora);
+  font-family: var(--headings);
   font-weight: 700;
   font-size: 11px;
   color: var(--color-primary);

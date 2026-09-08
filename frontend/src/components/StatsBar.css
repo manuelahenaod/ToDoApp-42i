@@ -103,7 +103,7 @@
 }
 
 .stat-value {
-  font-family: var(--sora);
+  font-family: var(--headings);
   font-weight: 800;
   font-size: 20px;
   color: var(--color-ink);

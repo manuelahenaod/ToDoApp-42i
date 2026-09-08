@@ -23,7 +23,7 @@
 .fill--done { background: var(--green); }
 
 .pct {
-  font-family: var(--sora);
+  font-family: var(--headings);
   font-weight: 600;
   font-size: 11px;
   min-width: 32px;
