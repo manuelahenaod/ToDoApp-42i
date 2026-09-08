@@ -15,6 +15,7 @@ export interface Task {
 
 export interface TaskNode extends Task {
   subtasks: TaskNode[];
+  total_effort?: number;
 }
 
 export interface ListResult {
@@ -33,11 +34,16 @@ export interface GlobalStats {
   done: number;
 }
 
+export type TaskSortKey = 'title' | 'status' | 'priority' | 'effort' | 'created_at';
+export type SortOrder = 'asc' | 'desc';
+
 export interface TaskListParams {
   status?: TaskStatus;
   priority?: TaskPriority;
   page?: number;
   limit?: number;
+  sort?: TaskSortKey;
+  order?: SortOrder;
 }
 
 export interface CreateTaskInput {
