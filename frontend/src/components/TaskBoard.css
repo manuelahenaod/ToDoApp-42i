@@ -66,11 +66,17 @@
 .card {
   background: var(--color-white);
   border: 1px solid var(--color-border);
+  border-left-width: 3px;
   border-radius: 12px;
   padding: 13px;
   cursor: pointer;
   transition: opacity 0.2s ease, border-color 0.15s ease;
 }
+
+.card--prio-critical { border-left-color: var(--prio-crit); }
+.card--prio-high { border-left-color: var(--color-primary); }
+.card--prio-medium { border-left-color: var(--prio-med); }
+.card--prio-low { border-left-color: var(--prio-low); }
 
 .card:hover { border-color: var(--color-primary-lighter); }
 
@@ -82,6 +88,9 @@
   font-size: 15px;
   color: var(--color-ink);
   line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .card--done .card-title { text-decoration: line-through; }
@@ -198,13 +207,12 @@
   .column-head { padding: 12px 14px 10px; }
   .column-list { padding: 8px; gap: 8px; }
 
-  .card { padding: 9px 10px; }
+  .card {
+    padding: 9px 10px;
+  }
 
   .card-title {
     font-size: 14px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   .card-desc {

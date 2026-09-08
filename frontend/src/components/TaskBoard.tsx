@@ -118,7 +118,7 @@ function BoardCard({
   const effort = node.total_effort ?? node.effort_estimate ?? 0;
 
   return (
-    <article className={`card${isDone ? ' card--done' : ''}`} onClick={onOpen}>
+    <article className={`card card--prio-${node.priority}${isDone ? ' card--done' : ''}`} onClick={onOpen}>
       <h3 className="card-title">{node.title}</h3>
       {node.description && <p className="card-desc">{node.description}</p>}
 
