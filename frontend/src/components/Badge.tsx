@@ -21,3 +21,12 @@ export function StatusBadge({ status }: { status: TaskStatus }) {
 export function PriorityBadge({ priority }: { priority: TaskPriority }) {
   return <span className={`badge badge--prio-${priority}`}>{PRIORITY_LABELS[priority]}</span>;
 }
+
+export function PriorityTag({ priority }: { priority: TaskPriority }) {
+  return (
+    <span className={`prio-tag prio-tag--${priority}`}>
+      <span className="prio-dot" />
+      {PRIORITY_LABELS[priority]}
+    </span>
+  );
+}

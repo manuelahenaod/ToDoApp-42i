@@ -2,7 +2,7 @@
   background: var(--color-white);
   border: 1px solid var(--color-border);
   border-radius: 12px;
-  padding: 14px;
+  padding: 12px 14px;
   box-shadow: var(--shadow);
   margin-bottom: 16px;
 }
@@ -10,7 +10,7 @@
 .stats-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .stat { text-align: center; }
@@ -18,8 +18,9 @@
 .stat-value {
   font-family: var(--sora);
   font-weight: 600;
-  font-size: 20px;
+  font-size: 18px;
   letter-spacing: -0.5px;
+  line-height: 1.2;
 }
 
 .stat--todo .stat-value { color: var(--color-ink); }
@@ -28,12 +29,12 @@
 
 .stat-label {
   display: block;
-  font-size: 10px;
+  font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 0.4px;
   color: var(--color-muted);
   font-weight: 500;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .bar-stacked {
@@ -49,28 +50,26 @@
 
 .seg--todo { background: #c3c3cc; }
 .seg--progress { background: var(--color-primary); }
-.seg--done { background: #22c55e; }
+.seg--done { background: var(--green); }
 
 /* ============ TABLET ============ */
 @media (min-width: 768px) {
-  .stats { padding: 18px; }
-  .stat-value { font-size: 26px; }
-  .stat-label { font-size: 11px; }
-  .bar-stacked { height: 14px; }
+  .stats { padding: 12px 18px; }
+  .stat-value { font-size: 20px; }
+  .stat-label { font-size: 10px; }
+  .bar-stacked { height: 10px; }
 }
 
 /* ============ DESKTOP ============ */
 @media (min-width: 1024px) {
-  .stats { padding: 22px; border-radius: 14px; }
-  .stat-value { font-size: 30px; }
-  .stat-label { font-size: 12px; }
-  .bar-stacked { height: 18px; }
+  .stats { padding: 14px 22px; border-radius: 14px; }
+  .stat-value { font-size: 22px; }
+  .stat-label { font-size: 10px; }
 }
 
 /* ============ WIDESCREEN ============ */
 @media (min-width: 1280px) {
-  .stats { padding: 26px; }
-  .stat-value { font-size: 34px; }
-  .stat-label { font-size: 13px; }
-  .bar-stacked { height: 22px; }
+  .stats { padding: 14px 26px; }
+  .stat-value { font-size: 22px; }
+  .stat-label { font-size: 11px; }
 }

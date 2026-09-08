@@ -1,8 +1,8 @@
 .app { min-height: 100vh; display: flex; flex-direction: column; }
 
-/* ============ HEADER (mobile) ============ */
+/* ============ HEADER ============ */
 .header {
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--color-header-bg);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--color-border);
   position: sticky;
@@ -13,41 +13,42 @@
 .header-inner {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
+  gap: 10px;
+  padding: 10px 16px;
   max-width: 1400px;
   margin: 0 auto;
+  height: 52px;
 }
 
 .brand {
   display: flex;
-  align-items: center;
+  align-items: baseline;
+  gap: 2px;
+  background: none;
+  border: none;
+  padding: 0;
   font-family: var(--sora);
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 16px;
   letter-spacing: -0.2px;
   cursor: pointer;
+  white-space: nowrap;
 }
 
-.brand-mark {
-  width: 34px;
-  height: 34px;
-  background: var(--color-primary);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--sora);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--color-white);
-}
+.brand-mark { color: var(--color-primary); }
+.brand-name { color: var(--color-ink); }
 
 .header-title {
+  flex: 1;
+  min-width: 0;
   font-family: var(--sora);
   font-weight: 600;
-  font-size: 17px;
-  letter-spacing: -0.2px;
-  flex: 1;
+  font-size: 14px;
+  letter-spacing: -0.1px;
+  color: var(--color-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .btn-primary {
@@ -55,12 +56,15 @@
   color: #fff;
   border: none;
   padding: 8px 14px;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
   transition: box-shadow 0.12s;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .btn-primary:hover { box-shadow: 0 2px 8px rgba(109, 40, 217, 0.35); }
@@ -69,28 +73,21 @@
 
 /* ============ TABLET ============ */
 @media (min-width: 768px) {
-  .header-inner { padding: 14px 24px; }
+  .header-inner { padding: 0 24px; height: 56px; }
+  .brand { font-size: 17px; }
   .content { padding: 20px 24px; }
 }
 
 /* ============ DESKTOP ============ */
 @media (min-width: 1024px) {
-  .header-inner { padding: 16px 32px; max-width: none; }
-
-  .brand-mark { width: 38px; height: 38px; font-size: 14px; }
-  .header-title { font-size: 24px; }
-  .btn-primary { padding: 10px 16px; font-size: 14px; }
-
+  .header-inner { padding: 0 32px; max-width: none; height: 60px; }
+  .brand { font-size: 18px; }
+  .header-title { font-size: 15px; }
   .content { max-width: none; margin: 0; padding: 24px 32px; }
 }
 
 /* ============ WIDESCREEN ============ */
 @media (min-width: 1280px) {
-  .header-inner { padding: 18px 48px; }
-
-  .brand-mark { width: 44px; height: 44px; font-size: 16px; border-radius: 10px; }
-  .header-title { font-size: 28px; }
-  .btn-primary { padding: 12px 20px; font-size: 15px; }
-
+  .header-inner { padding: 0 48px; max-width: none; height: 60px; }
   .content { padding: 28px 48px; }
 }
