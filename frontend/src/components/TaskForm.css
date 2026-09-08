@@ -35,7 +35,7 @@
 .task-form-head h3 {
   font-size: 17px;
   font-weight: 700;
-  font-family: var(--sora);
+  font-family: var(--headings);
   color: var(--color-ink);
 }
 
@@ -98,9 +98,30 @@
   gap: 12px;
 }
 
+.field--error input { border-color: #DC2626; }
+
+.field--locked input {
+  background: var(--color-surface);
+  color: var(--color-muted);
+  cursor: not-allowed;
+}
+
+.field .field-error {
+  font-size: 12px;
+  font-weight: 600;
+  color: #DC2626;
+}
+
+.field .field-hint {
+  font-size: 12px;
+  font-weight: 600;
+  color: #DC2626;
+  line-height: 1.4;
+}
+
 .form-error {
   background: var(--crit-bg);
-  color: var(--crit-text);
+  color: #DC2626;
   font-size: 13px;
   padding: 10px 14px;
   border-radius: var(--radius-sm);

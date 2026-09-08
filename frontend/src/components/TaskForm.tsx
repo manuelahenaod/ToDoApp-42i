@@ -11,6 +11,7 @@ interface TaskFormProps {
   defaultTitle?: string;
   defaultDescription?: string;
   defaultEffort?: string;
+  effortLocked?: boolean;
   onSubmit: (input: CreateTaskInput) => Promise<void>;
   onClose: () => void;
 }
@@ -24,6 +25,7 @@ export default function TaskForm({
   defaultTitle = '',
   defaultDescription = '',
   defaultEffort = '',
+  effortLocked = false,
   onSubmit,
   onClose,
 }: TaskFormProps) {
@@ -39,6 +41,17 @@ export default function TaskForm({
   const set = <K extends keyof typeof form>(key: K, value: (typeof form)[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
 
+  const effortRaw = form.effort.trim();
+  const effortError =
+    effortRaw === ''
+      ? null
+      : (() => {
+          const n = Number(effortRaw);
+          if (!Number.isInteger(n)) return 'Effort must be a whole number.';
+          if (n < 0) return 'Effort cannot be negative.';
+          return null;
+        })();
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     const titleValue = form.title.trim();
@@ -46,13 +59,14 @@ export default function TaskForm({
       setError('Title is required.');
       return;
     }
+    if (effortError) return;
 
     const input: CreateTaskInput = {
       title: titleValue,
       description: form.description.trim() || undefined,
       priority: form.priority,
     };
-    if (form.effort.trim() !== '') input.effort_estimate = Number(form.effort);
+    if (!effortLocked && form.effort.trim() !== '') input.effort_estimate = Number(form.effort);
 
     setSaving(true);
     setError(null);
@@ -106,7 +120,7 @@ export default function TaskForm({
             </select>
           </label>
 
-          <label className="field">
+          <label className={`field${effortLocked ? ' field--locked' : ''}${effortError ? ' field--error' : ''}`}>
             <span>Effort estimate</span>
             <input
               type="number"
@@ -115,7 +129,14 @@ export default function TaskForm({
               value={form.effort}
               onChange={(e) => set('effort', e.target.value)}
               placeholder="e.g. 5"
+              disabled={effortLocked}
+              aria-invalid={effortError ? true : undefined}
             />
+            {effortLocked ? (
+              <span className="field-hint">Effort is derived from its subtasks — edit a subtask to change it.</span>
+            ) : effortError ? (
+              <span className="field-error">{effortError}</span>
+            ) : null}
           </label>
         </div>
 
