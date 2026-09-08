@@ -1,18 +1,6 @@
+import { PRIORITY_LABELS, STATUS_LABELS } from '../labels';
 import type { TaskPriority, TaskStatus } from '../types/task';
 import './Badge.css';
-
-const STATUS_LABELS: Record<TaskStatus, string> = {
-  todo: 'To do',
-  in_progress: 'In progress',
-  done: 'Done',
-};
-
-const PRIORITY_LABELS: Record<TaskPriority, string> = {
-  low: 'Low',
-  medium: 'Medium',
-  high: 'High',
-  critical: 'Critical',
-};
 
 export function StatusBadge({ status }: { status: TaskStatus }) {
   return <span className={`badge badge--${status}`}>{STATUS_LABELS[status]}</span>;

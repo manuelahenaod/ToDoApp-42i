@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import TaskForm from './components/TaskForm';
 import HomePage from './pages/HomePage';
+import TaskDetailPage from './pages/TaskDetailPage';
 import { createTask } from './api/task';
 
 function AppShell() {
@@ -15,6 +16,7 @@ function AppShell() {
       <Routes>
         <Route element={<Layout onNewTask={() => setNewTaskOpen(true)} />}>
           <Route index element={<HomePage refreshKey={refresh} />} />
+          <Route path="tasks/:id" element={<TaskDetailPage />} />
         </Route>
       </Routes>
 

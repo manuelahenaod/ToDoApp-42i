@@ -34,6 +34,23 @@ export interface GlobalStats {
   done: number;
 }
 
+export interface TaskSummary {
+  id: number;
+  title: string;
+}
+
+export interface EffortStats {
+  total: number;
+  todo: number;
+  in_progress: number;
+  done: number;
+}
+
+export interface TaskDetail extends TaskNode {
+  effort: EffortStats;
+  parents: TaskSummary[];
+}
+
 export type TaskSortKey = 'title' | 'status' | 'priority' | 'effort' | 'created_at';
 export type SortOrder = 'asc' | 'desc';
 

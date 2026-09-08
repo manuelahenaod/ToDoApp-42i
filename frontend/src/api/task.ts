@@ -3,6 +3,7 @@ import type {
   GlobalStats,
   ListResult,
   Task,
+  TaskDetail,
   TaskListParams,
   UpdateTaskInput,
 } from '../types/task';
@@ -14,8 +15,8 @@ export function listTasks(params: TaskListParams = {}): Promise<ListResult> {
   return request<ListResult>(`${API}/tasks${buildQuery(params)}`);
 }
 
-export function getTask(id: number): Promise<Task> {
-  return request<Task>(`${API}/tasks/${id}`);
+export function getTask(id: number): Promise<TaskDetail> {
+  return request<TaskDetail>(`${API}/tasks/${id}`);
 }
 
 export function createTask(input: CreateTaskInput): Promise<Task> {
