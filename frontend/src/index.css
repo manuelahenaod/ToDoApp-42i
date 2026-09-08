@@ -1,45 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
 :root {
-  /* Brand */
-  --color-primary:        #6D28D9;
-  --color-primary-hover:  #5B21B6;
-  --color-primary-light:  #EDE9FE;
-  --color-primary-lighter: #DDD6FE;
+  /* Brand Corporate Colors */
+  --color-primary:         #4F46E5;
+  --color-primary-hover:   #4338CA;
+  --color-primary-light:   #EEF2FF;
+  --color-primary-lighter: #E0E7FF;
 
-  /* Neutrals */
-  --color-ink:       #1C1B1F;
-  --color-ink-2:     #3F3F46;
-  --color-muted:     #71717A;
-  --color-muted-2:   #A1A1AA;
-  --color-bg:        #FAFAF9;
-  --color-white:     #FFFFFF;
-  --color-surface:   #F4F4F5;
-  --color-border:    #E4E4E7;
-  --color-header-bg: rgba(255, 255, 255, 0.9);
+  /* Neutrals - Slate Light */
+  --color-ink:        #0F172A;
+  --color-ink-2:      #334155;
+  --color-muted:      #64748B;
+  --color-muted-2:    #94A3B8;
+  --color-bg:         #F8FAFC;
+  --color-white:      #FFFFFF;
+  --color-surface:    #F1F5F9;
+  --color-border:     #E2E8F0;
+  --color-border-subtle: #F1F5F9;
+  --color-header-bg:  rgba(255, 255, 255, 0.85);
 
-  /* Status colors */
-  --todo-text: #71717A;  --todo-bg: #F4F4F5;
-  --prog-text: #6D28D9;  --prog-bg: #EDE9FE;
-  --done-text: #16A34A;  --done-bg: #DCFCE7;
-  --crit-text: #DC2626;  --crit-bg: #FEE2E2;
+  /* Status Colors */
+  --todo-text: #475569;  --todo-bg: #F1F5F9;
+  --prog-text: #4338CA;  --prog-bg: #E0E7FF;
+  --done-text: #047857;  --done-bg: #D1FAE5;
+  --crit-text: #B91C1C;  --crit-bg: #FEE2E2;
 
-  /* Priority dots */
-  --prio-crit: #DC2626;
-  --prio-med:  #E0A426;
-  --prio-low:  #A1A1AA;
+  /* Priority Dot & Badges */
+  --prio-crit-bg: #FEF2F2; --prio-crit-text: #EF4444; --prio-crit: #EF4444;
+  --prio-high-bg: #FFF7ED; --prio-high-text: #F97316; --prio-high: #F97316;
+  --prio-med-bg:  #FEFCE8; --prio-med-text:  #EAB308; --prio-med:  #EAB308;
+  --prio-low-bg:  #F8FAFC; --prio-low-text:  #64748B; --prio-low:  #94A3B8;
 
-  --green: #16A34A;
+  --green: #10B981;
 
+  --radius-sm: 8px;
   --radius: 12px;
-  --shadow: 0 1px 2px rgba(28, 27, 31, 0.06), 0 1px 4px rgba(28, 27, 31, 0.08);
-  --shadow-lift: 0 2px 10px rgba(109, 40, 217, 0.14);
+  --radius-lg: 16px;
+  --radius-full: 9999px;
 
-  --sora: 'Sora', 'Segoe UI', system-ui, sans-serif;
-  --inter: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  --shadow-lift: 0 12px 24px -4px rgba(79, 70, 229, 0.15);
+
+  --sora: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --inter: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body, #root { height: 100%; }
+html, body, #root {
+  height: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
 
 body {
   font-family: var(--inter);
@@ -47,38 +61,42 @@ body {
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-/* ============ DARK THEME ============ */
+/* ============ DARK THEME (Sober & Professional Corporate) ============ */
 body.dark {
-  --color-primary:        #A78BFA;
-  --color-primary-hover:  #C4B5FD;
-  --color-primary-light:  #3B2F7A;
-  --color-primary-lighter: #6D28D9;
+  --color-primary:         #6366F1;
+  --color-primary-hover:   #818CF8;
+  --color-primary-light:   #1E2030;
+  --color-primary-lighter: #2E3150;
 
-  --color-ink:       #F4F5F7;
-  --color-ink-2:     #C2C4CC;
-  --color-muted:     #A0A3AD;
-  --color-muted-2:   #6E717C;
-  --color-bg:        #141418;
-  --color-white:     #1E1E23;
-  --color-surface:   #2A2A31;
-  --color-border:    #3A3A43;
-  --color-header-bg: rgba(30, 30, 35, 0.9);
+  --color-ink:        #EDEDED;
+  --color-ink-2:      #C8C9D3;
+  --color-muted:      #8E8F9A;
+  --color-muted-2:    #5C5D69;
+  --color-bg:         #121316;
+  --color-white:      #1E1F24;
+  --color-surface:    #18191D;
+  --color-border:     #2D2E35;
+  --color-border-subtle: #24252B;
+  --color-header-bg:  rgba(18, 19, 22, 0.9);
 
-  --todo-text: #A0A3AD;  --todo-bg: #2A2A31;
-  --prog-text: #C4B5FD;  --prog-bg: #3B2F7A;
-  --done-text: #4ADE80;  --done-bg: #14532D;
-  --crit-text: #FCA5A5;  --crit-bg: #7F1D1D;
+  --todo-text: #8E8F9A;  --todo-bg: #26272E;
+  --prog-text: #818CF8;  --prog-bg: #1E2035;
+  --done-text: #34D399;  --done-bg: #142E25;
+  --crit-text: #F87171;  --crit-bg: #351A1A;
 
-  --prio-crit: #F87171;
-  --prio-med:  #F5C354;
-  --prio-low:  #8B8D96;
+  --prio-crit-bg: #2D1B1B; --prio-crit-text: #F87171; --prio-crit: #EF4444;
+  --prio-high-bg: #2B1D14; --prio-high-text: #FB923C; --prio-high: #F97316;
+  --prio-med-bg:  #292314; --prio-med-text:  #FACC15; --prio-med:  #EAB308;
+  --prio-low-bg:  #202127; --prio-low-text:  #8E8F9A; --prio-low:  #64748B;
 
-  --green: #4ADE80;
+  --green: #10B981;
 
-  --shadow: none;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
 }
 
 a { color: var(--color-primary); text-decoration: none; }
@@ -86,4 +104,20 @@ a:hover { text-decoration: underline; }
 
 button { font-family: var(--inter); }
 
-h1, h2, h3, .font-sora { font-family: var(--sora); letter-spacing: -0.2px; }
+h1, h2, h3, .font-sora { font-family: var(--sora); letter-spacing: -0.02em; }
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-muted-2); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-muted); }
+
+/* Animation Keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out forwards;
+}

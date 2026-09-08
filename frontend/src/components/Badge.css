@@ -1,12 +1,13 @@
 .badge {
-  display: inline-block;
-  padding: 3px 9px;
-  border-radius: 999px;
-  font-size: 10px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  line-height: 1.5;
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
   white-space: nowrap;
 }
 
@@ -14,30 +15,36 @@
 .badge--in_progress { background: var(--prog-bg); color: var(--prog-text); }
 .badge--done { background: var(--done-bg); color: var(--done-text); }
 
-.badge--prio-low { background: var(--color-surface); color: var(--color-muted); }
-.badge--prio-medium { background: var(--prog-bg); color: var(--prog-text); }
-.badge--prio-high { background: var(--color-primary-lighter); color: var(--color-primary); }
-.badge--prio-critical { background: var(--crit-bg); color: var(--crit-text); }
+.badge--prio-low { background: var(--prio-low-bg); color: var(--prio-low-text); }
+.badge--prio-medium { background: var(--prio-med-bg); color: var(--prio-med-text); }
+.badge--prio-high { background: var(--prio-high-bg); color: var(--prio-high-text); }
+.badge--prio-critical { background: var(--prio-crit-bg); color: var(--prio-crit-text); }
 
 /* ============ PRIORITY TAG (dot + text) ============ */
 .prio-tag {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--color-muted);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
+.prio-tag--low { background: var(--prio-low-bg); color: var(--prio-low-text); }
+.prio-tag--medium { background: var(--prio-med-bg); color: var(--prio-med-text); }
+.prio-tag--high { background: var(--prio-high-bg); color: var(--prio-high-text); }
+.prio-tag--critical { background: var(--prio-crit-bg); color: var(--prio-crit-text); }
+
 .prio-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: var(--color-muted-2);
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
   flex: none;
 }
 
 .prio-tag--critical .prio-dot { background: var(--prio-crit); }
-.prio-tag--high .prio-dot { background: var(--color-primary); }
+.prio-tag--high .prio-dot { background: var(--prio-high); }
 .prio-tag--medium .prio-dot { background: var(--prio-med); }
 .prio-tag--low .prio-dot { background: var(--prio-low); }
