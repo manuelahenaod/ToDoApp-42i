@@ -1,5 +1,13 @@
+import { useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import './Layout.css';
+
+type Theme = 'light' | 'dark';
+
+function getInitialTheme(): Theme {
+  const saved = localStorage.getItem('todo-app-theme');
+  return saved === 'dark' ? 'dark' : 'light';
+}
 
 interface LayoutProps {
   onNewTask: () => void;
@@ -8,6 +16,12 @@ interface LayoutProps {
 export default function Layout({ onNewTask }: LayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
+
+  useEffect(() => {
+    document.body.classList.toggle('dark', theme === 'dark');
+    localStorage.setItem('todo-app-theme', theme);
+  }, [theme]);
 
   return (
     <div className="app">
@@ -20,6 +34,15 @@ export default function Layout({ onNewTask }: LayoutProps) {
           <h1 className="header-title">
             {location.pathname === '/' ? 'Board' : 'Task Details'}
           </h1>
+          <button
+            type="button"
+            className="theme-btn"
+            onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
+            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+          >
+            {theme === 'dark' ? '☀' : '◐'}
+          </button>
           <button type="button" className="btn-primary" onClick={onNewTask}>
             + New task
           </button>
