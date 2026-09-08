@@ -17,7 +17,9 @@ export async function request<T>(url: string, init?: RequestInit): Promise<T> {
     let message = `Request failed with status ${res.status}`;
     try {
       const body = await res.json();
-      if (body?.error?.message) message = body.error.message;
+      if (body?.error) {
+        message = typeof body.error === 'string' ? body.error : body.error?.message || message;
+      }
     } catch {
       /* ignore parse errors */
     }
