@@ -21,7 +21,6 @@ export interface TaskNode extends Task {
 export interface CreateTaskInput {
   title: string;
   description?: string;
-  status?: TaskStatus;
   priority?: TaskPriority;
   effort_estimate?: number;
   parent_id?: number;

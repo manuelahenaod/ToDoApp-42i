@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import type { CreateTaskInput, TaskPriority, TaskStatus } from '../types/task';
+import type { CreateTaskInput, TaskPriority } from '../types/task';
 import './TaskForm.css';
 
 interface TaskFormProps {
   title: string;
   submitLabel: string;
-  defaultStatus?: TaskStatus;
   defaultPriority?: TaskPriority;
   defaultTitle?: string;
   defaultDescription?: string;
@@ -15,13 +14,11 @@ interface TaskFormProps {
   onClose: () => void;
 }
 
-const STATUSES: TaskStatus[] = ['todo', 'in_progress', 'done'];
 const PRIORITIES: TaskPriority[] = ['low', 'medium', 'high', 'critical'];
 
 export default function TaskForm({
   title,
   submitLabel,
-  defaultStatus = 'todo',
   defaultPriority = 'medium',
   defaultTitle = '',
   defaultDescription = '',
@@ -32,7 +29,6 @@ export default function TaskForm({
   const [form, setForm] = useState({
     title: defaultTitle,
     description: defaultDescription,
-    status: defaultStatus,
     priority: defaultPriority,
     effort: defaultEffort,
   });
@@ -53,7 +49,6 @@ export default function TaskForm({
     const input: CreateTaskInput = {
       title: titleValue,
       description: form.description.trim() || undefined,
-      status: form.status,
       priority: form.priority,
     };
     if (form.effort.trim() !== '') input.effort_estimate = Number(form.effort);
@@ -97,14 +92,6 @@ export default function TaskForm({
         </label>
 
         <div className="field-row">
-          <label className="field">
-            <span>Status</span>
-            <select value={form.status} onChange={(e) => set('status', e.target.value as TaskStatus)}>
-              {STATUSES.map((s) => (
-                <option key={s} value={s}>{s.replace('_', ' ')}</option>
-              ))}
-            </select>
-          </label>
           <label className="field">
             <span>Priority</span>
             <select value={form.priority} onChange={(e) => set('priority', e.target.value as TaskPriority)}>

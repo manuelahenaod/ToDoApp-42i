@@ -55,8 +55,19 @@ export default function HomePage({ refreshKey }: HomePageProps) {
             }
             return false;
           };
+          const derive = (nodes: TaskNode[]) => {
+            for (const n of nodes) {
+              derive(n.subtasks);
+              if (n.subtasks.length > 0) {
+                if (n.subtasks.every((c) => c.status === 'done')) n.status = 'done';
+                else if (n.subtasks.every((c) => c.status === 'todo')) n.status = 'todo';
+                else n.status = 'in_progress';
+              }
+            }
+          };
           const tasks = [...prev.tasks];
           walk(tasks);
+          derive(tasks);
           return { ...prev, tasks };
         });
       })

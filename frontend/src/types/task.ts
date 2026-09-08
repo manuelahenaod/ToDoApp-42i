@@ -49,13 +49,13 @@ export interface TaskListParams {
 export interface CreateTaskInput {
   title: string;
   description?: string;
-  status?: TaskStatus;
   priority?: TaskPriority;
   effort_estimate?: number;
   parent_id?: number;
 }
 
 export type UpdateTaskInput = Partial<CreateTaskInput> & {
+  status?: TaskStatus;
   effort_estimate?: number | null;
   parent_id?: number | null;
 };

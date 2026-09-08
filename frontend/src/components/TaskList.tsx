@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import type { ListResult, TaskNode, TaskPriority, TaskStatus } from '../types/task';
-import { PriorityBadge } from './Badge';
+import { PriorityBadge, StatusBadge } from './Badge';
 import './TaskList.css';
 
 export interface TaskFilters {
@@ -178,7 +178,11 @@ export default function TaskList({ data, filters, sort, page, onFilterChange, on
                   </button>
                 </div>
                 <div className="card-meta">
-                  <StatusSelect id={task.id} status={task.status} onChange={onStatusChange} />
+                  {task.subtasks.length > 0 ? (
+                    <StatusBadge status={task.status} />
+                  ) : (
+                    <StatusSelect id={task.id} status={task.status} onChange={onStatusChange} />
+                  )}
                   <PriorityBadge priority={task.priority} />
                   <span className="card-effort">{task.total_effort ?? task.effort_estimate ?? 0}</span>
                 </div>
@@ -243,7 +247,11 @@ function SubCard({ node, depth, isExpanded, toggle, onStatusChange, onAddSubtask
         </span>
       </div>
       <div className="card-meta">
-        <StatusSelect id={node.id} status={node.status} onChange={onStatusChange} />
+        {node.subtasks.length > 0 ? (
+          <StatusBadge status={node.status} />
+        ) : (
+          <StatusSelect id={node.id} status={node.status} onChange={onStatusChange} />
+        )}
         <PriorityBadge priority={node.priority} />
         <span className="card-effort">{node.total_effort ?? node.effort_estimate ?? 0}</span>
         <button type="button" className="add-subtask add-subtask--tiny" onClick={() => onAddSubtask(node)} aria-label="Add subtask">
@@ -275,7 +283,13 @@ function TaskRow({ node, depth, isExpanded, toggle, onStatusChange, onAddSubtask
           {node.title}
           <span className="id"> #{node.id}</span>
         </td>
-        <td><StatusSelect id={node.id} status={node.status} onChange={onStatusChange} /></td>
+        <td>
+          {node.subtasks.length > 0 ? (
+            <StatusBadge status={node.status} />
+          ) : (
+            <StatusSelect id={node.id} status={node.status} onChange={onStatusChange} />
+          )}
+        </td>
         <td><PriorityBadge priority={node.priority} /></td>
         <td className="col-effort">{node.total_effort ?? node.effort_estimate ?? 0}</td>
         <td className="col-progress"><ProgressBar node={node} /></td>

@@ -192,6 +192,25 @@ export function stampEffort(nodes: TaskNode[], effort: Map<number, number>): Tas
   return nodes;
 }
 
+// A task's own status is derived from its direct children once it has subtasks
+export function deriveStatus(childStatuses: TaskStatus[]): TaskStatus {
+  if (childStatuses.length === 0) return 'todo';
+  if (childStatuses.every((s) => s === 'done')) return 'done';
+  if (childStatuses.every((s) => s === 'todo')) return 'todo';
+  return 'in_progress';
+}
+
+// Derives the effective status bottom-up for every node that has subtasks
+export function stampStatus(nodes: TaskNode[]): TaskNode[] {
+  for (const node of nodes) {
+    stampStatus(node.subtasks);
+    if (node.subtasks.length > 0) {
+      node.status = deriveStatus(node.subtasks.map((c) => c.status));
+    }
+  }
+  return nodes;
+}
+
 // ---------- list queries (filters, sort, pagination in JS) ----------
 
 export function prepareTaskList(
@@ -202,7 +221,7 @@ export function prepareTaskList(
   const priority = validatePriority(filters.priority);
 
   const effort = eachSubtreeEffort(all);
-  const roots = stampEffort(buildTree(all), effort);
+  const roots = stampStatus(stampEffort(buildTree(all), effort));
 
   let filtered = roots;
   if (status) filtered = filtered.filter((r) => r.status === status);
@@ -229,7 +248,6 @@ export function prepareTaskList(
 
 export async function createTask(input: CreateTaskInput): Promise<Task> {
   const title = validateTitle(input.title);
-  const status = validateStatus(input.status);
   const priority = validatePriority(input.priority);
   const effort = validateEffort(input.effort_estimate);
 
@@ -245,7 +263,7 @@ export async function createTask(input: CreateTaskInput): Promise<Task> {
     [
       title,
       input.description ?? '',
-      status ?? 'todo',
+      'todo',
       priority ?? 'medium',
       effort ?? null,
       parentId,
@@ -269,7 +287,7 @@ export async function getTask(id: number): Promise<TaskDetail> {
   await requireTask(id);
   const { rows } = await pool.query('SELECT * FROM tasks');
   const effort = eachSubtreeEffort(rows);
-  const node = stampEffort([buildSubtree(rows, id)!], effort)[0];
+  const node = stampStatus(stampEffort([buildSubtree(rows, id)!], effort))[0];
   return { ...node, effort: aggregateEffort(flattenNode(node)) };
 }
 
@@ -294,6 +312,10 @@ export async function updateTask(id: number, input: UpdateTaskInput): Promise<Ta
     values.push(input.description);
   }
   if (input.status !== undefined) {
+    const { rows: childRows } = await pool.query('SELECT 1 FROM tasks WHERE parent_id = $1 LIMIT 1', [id]);
+    if (childRows.length > 0) {
+      throw new ValidationError('cannot change the status of a task that has subtasks');
+    }
     fields.push(`status = ${param()}`);
     values.push(validateStatus(input.status));
   }
