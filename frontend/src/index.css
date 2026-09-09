@@ -104,6 +104,18 @@ a:hover { text-decoration: underline; }
 
 button { font-family: var(--inter); }
 
+/* Hide number input spinners */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 h1, h2, h3, .font-headings { font-family: var(--headings); letter-spacing: -0.02em; }
 
 /* Custom scrollbar */

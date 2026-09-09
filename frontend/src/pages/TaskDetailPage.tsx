@@ -1,13 +1,14 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, ChevronDown, ChevronRight, Info, Pencil, Plus, Trash2, Zap } from 'lucide-react';
-import { createSubtask, deleteTask, getTask, updateTask } from '../api/task';
-import { PriorityBadge } from '../components/Badge';
-import { STATUS_LABELS } from '../types/labels';
-import ProgressBar from '../components/ProgressBar';
-import TaskForm from '../components/TaskForm';
-import ConfirmModal from '../components/ConfirmModal';
-import type { TaskDetail, TaskNode, TaskStatus } from '../types/task';
+import { useTask } from '../features/tasks/hooks/useTask';
+import { useTaskMutations } from '../features/tasks/hooks/useTaskMutations';
+import { PriorityBadge } from '../features/tasks/components/Badge';
+import { STATUS_LABELS } from '../features/tasks/types/labels';
+import ProgressBar from '../features/tasks/components/ProgressBar';
+import TaskForm from '../features/tasks/components/TaskForm';
+import ConfirmModal from '../shared/ui/ConfirmModal';
+import type { TaskNode, TaskStatus } from '../features/tasks/types/task';
 import './TaskDetailPage.css';
 
 function formatDate(value: string): string {
@@ -20,29 +21,20 @@ function formatDate(value: string): string {
 export default function TaskDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [task, setTask] = useState<TaskDetail | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [editOpen, setEditOpen] = useState(false);
   const [subtaskOpen, setSubtaskOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [deleting, setDeleting] = useState(false);
 
   const taskId = Number(id);
+  const invalidId = !Number.isInteger(taskId) || taskId <= 0;
 
-  const reload = useCallback(() => {
-    getTask(taskId)
-      .then((t) => {
-        setTask(t);
-        setError(null);
-      })
-      .catch((err) => setError(err instanceof Error ? err.message : 'Unexpected error.'));
-  }, [taskId]);
+  const { task, error, reload } = useTask(invalidId ? -1 : taskId);
+  const { pending: deleting, remove, update, createSubtask } = useTaskMutations();
 
-  useEffect(() => {
-    reload();
-  }, [reload]);
+  const visibleError = error ?? actionError;
 
-  if (!Number.isInteger(taskId) || taskId <= 0) {
+  if (invalidId) {
     return (
       <div className="detail-fallback">
         <p>Invalid task id.</p>
@@ -55,28 +47,27 @@ export default function TaskDetailPage() {
 
   async function handleStatusChange(status: TaskStatus) {
     try {
-      await updateTask(taskId, { status });
+      await update(taskId, { status });
+      setActionError(null);
       reload();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unexpected error.');
+      setActionError(err instanceof Error ? err.message : 'Unexpected error.');
     }
   }
 
   async function handleDelete() {
-    setDeleting(true);
     try {
-      await deleteTask(taskId);
+      await remove(taskId);
       navigate('/');
     } catch (err) {
-      setDeleting(false);
-      setError(err instanceof Error ? err.message : 'Unexpected error.');
+      setActionError(err instanceof Error ? err.message : 'Unexpected error.');
     }
   }
 
-  if (error) {
+  if (visibleError) {
     return (
       <div className="detail-fallback">
-        <p>{error}</p>
+        <p>{visibleError}</p>
         <Link className="back-link" to="/">
           <ArrowLeft size={15} /> Back to board
         </Link>
@@ -142,12 +133,6 @@ export default function TaskDetailPage() {
           </div>
         </div>
 
-        {hasSubtasks && (
-          <p className="detail-hint">
-            Status is derived from subtasks — this task has {task.subtasks.length} subtask{task.subtasks.length === 1 ? '' : 's'}.
-          </p>
-        )}
-
         {task.description && <p className="detail-desc">{task.description}</p>}
 
         <ProgressBar node={task} />
@@ -201,7 +186,7 @@ export default function TaskDetailPage() {
           defaultEffort={task.effort_estimate !== null && task.effort_estimate !== undefined ? String(task.effort_estimate) : ''}
           effortLocked={hasSubtasks}
           onSubmit={async (input) => {
-            await updateTask(taskId, input);
+            await update(taskId, input);
             setEditOpen(false);
             reload();
           }}

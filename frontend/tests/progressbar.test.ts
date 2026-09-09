@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { taskProgress } from '../src/utils/taskProgress';
-import type { TaskNode } from '../src/types/task';
+import { taskProgress } from '../src/features/tasks/utils/taskProgress';
+import type { TaskNode } from '../src/features/tasks/types/task';
 
 function node(partial: Partial<TaskNode> = {}): TaskNode {
   return {

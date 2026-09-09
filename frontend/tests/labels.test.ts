@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { PRIORITY_LABELS, STATUS_LABELS } from '../src/types/labels';
-import type { TaskPriority, TaskStatus } from '../src/types/task';
+import { PRIORITY_LABELS, STATUS_LABELS } from '../src/features/tasks/types/labels';
+import type { TaskPriority, TaskStatus } from '../src/features/tasks/types/task';
 
 const STATUSES: TaskStatus[] = ['todo', 'in_progress', 'done'];
 const PRIORITIES: TaskPriority[] = ['low', 'medium', 'high', 'critical'];

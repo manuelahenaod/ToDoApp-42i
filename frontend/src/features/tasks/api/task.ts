@@ -7,7 +7,7 @@ import type {
   TaskListParams,
   UpdateTaskInput,
 } from '../types/task';
-import { buildQuery, request } from './client';
+import { buildQuery, request } from '../../../shared/api/client';
 
 const API = '/api';
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowUpDown,
@@ -10,9 +10,8 @@ import {
   Plus,
   Zap,
 } from 'lucide-react';
-import { listTasks } from '../api/task';
+import { useTaskColumns } from '../hooks/useTaskColumns';
 import type {
-  ListResult,
   SortOrder,
   TaskNode,
   TaskPriority,
@@ -50,8 +49,6 @@ const SORT_OPTIONS: SortOption[] = [
   { key: 'effort', label: 'Effort', sort: 'effort', order: 'desc' },
 ];
 
-type ColumnState = { tasks: TaskNode[]; total: number };
-
 interface TaskBoardProps {
   refreshKey: number;
   onAddSubtask: (parent: TaskNode) => void;
@@ -59,11 +56,6 @@ interface TaskBoardProps {
 
 export default function TaskBoard({ refreshKey, onAddSubtask }: TaskBoardProps) {
   const navigate = useNavigate();
-  const [columns, setColumns] = useState<Record<TaskStatus, ColumnState>>({
-    todo: { tasks: [], total: 0 },
-    in_progress: { tasks: [], total: 0 },
-    done: { tasks: [], total: 0 },
-  });
   const [limits, setLimits] = useState<Record<TaskStatus, number>>({
     todo: INITIAL_LIMIT,
     in_progress: INITIAL_LIMIT,
@@ -73,29 +65,10 @@ export default function TaskBoard({ refreshKey, onAddSubtask }: TaskBoardProps) 
   const [sortKey, setSortKey] = useState<TaskSortKey>('created_at');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 
+  const columns = useTaskColumns(priority, sortKey, sortOrder, limits, refreshKey);
+
   const resetLimits = () =>
     setLimits({ todo: INITIAL_LIMIT, in_progress: INITIAL_LIMIT, done: INITIAL_LIMIT });
-
-  useEffect(() => {
-    let cancelled = false;
-    Promise.all(
-      COLUMNS.map(({ id }) =>
-        listTasks({ status: id, priority, limit: limits[id], sort: sortKey, order: sortOrder })
-          .then((res: ListResult) => ({ status: id, tasks: res.tasks, total: res.total }))
-          .catch(() => ({ status: id, tasks: [] as TaskNode[], total: 0 }))
-      )
-    ).then((results) => {
-      if (cancelled) return;
-      setColumns((prev) => {
-        const next = { ...prev };
-        for (const r of results) next[r.status] = { tasks: r.tasks, total: r.total };
-        return next;
-      });
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [refreshKey, limits, priority, sortKey, sortOrder]);
 
   const loadMore = (status: TaskStatus) =>
     setLimits((l) => ({ ...l, [status]: l[status] + STEP }));

@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom';
-import Layout from './components/Layout';
-import TaskForm from './components/TaskForm';
+import Layout from './shared/ui/Layout';
+import TaskForm from './features/tasks/components/TaskForm';
 import HomePage from './pages/HomePage';
 import TaskDetailPage from './pages/TaskDetailPage';
-import { createTask } from './api/task';
+import { createTask } from './features/tasks/api/task';
 
 function AppShell() {
   const [newTaskOpen, setNewTaskOpen] = useState(false);

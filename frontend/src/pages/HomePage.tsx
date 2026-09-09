@@ -1,24 +1,21 @@
-import { useEffect, useState } from 'react';
-import { createSubtask, getStats } from '../api/task';
-import StatsBar from '../components/StatsBar';
-import TaskBoard from '../components/TaskBoard';
-import TaskForm from '../components/TaskForm';
-import type { GlobalStats, TaskNode } from '../types/task';
+import { useState } from 'react';
+import { useGlobalStats } from '../features/tasks/hooks/useGlobalStats';
+import { useTaskMutations } from '../features/tasks/hooks/useTaskMutations';
+import StatsBar from '../features/tasks/components/StatsBar';
+import TaskBoard from '../features/tasks/components/TaskBoard';
+import TaskForm from '../features/tasks/components/TaskForm';
+import type { TaskNode } from '../features/tasks/types/task';
 
 interface HomePageProps {
   refreshKey: number;
 }
 
 export default function HomePage({ refreshKey }: HomePageProps) {
-  const [stats, setStats] = useState<GlobalStats | null>(null);
   const [bump, setBump] = useState(0);
   const [subtaskParent, setSubtaskParent] = useState<TaskNode | null>(null);
 
-  useEffect(() => {
-    getStats()
-      .then(setStats)
-      .catch(() => setStats(null));
-  }, [refreshKey, bump]);
+  const stats = useGlobalStats(refreshKey + bump);
+  const { createSubtask } = useTaskMutations();
 
   return (
     <div>
