@@ -44,6 +44,12 @@ export function parseId(raw: string): number {
   return id;
 }
 
+export const MAX_TITLE_LENGTH = 255;
+
+function capitalizeFirst(value: string): string {
+  return value.charAt(0).toLocaleUpperCase() + value.slice(1);
+}
+
 function validateTitle(title?: string): string {
   if (title === undefined) {
     throw new ValidationError('title is required');
@@ -52,7 +58,10 @@ function validateTitle(title?: string): string {
   if (!trimmed) {
     throw new ValidationError('title must not be empty');
   }
-  return trimmed;
+  if (trimmed.length > MAX_TITLE_LENGTH) {
+    throw new ValidationError(`title must be ${MAX_TITLE_LENGTH} characters or fewer`);
+  }
+  return capitalizeFirst(trimmed);
 }
 
 function validateEffort(effort?: number | null): number | null | undefined {
