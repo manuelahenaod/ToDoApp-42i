@@ -33,13 +33,7 @@ const COLUMNS: { id: TaskStatus; label: string; icon: typeof CircleDot }[] = [
 const INITIAL_LIMIT = 4;
 const STEP = 5;
 
-const PRIORITY_FILTERS: (TaskPriority | undefined)[] = [
-  undefined,
-  'critical',
-  'high',
-  'medium',
-  'low',
-];
+const PRIORITY_OPTIONS: TaskPriority[] = ['critical', 'high', 'medium', 'low'];
 
 interface SortOption {
   key: string;
@@ -134,24 +128,28 @@ export default function TaskBoard({ refreshKey, onAddSubtask }: TaskBoardProps) 
     <>
       <div className="board-toolbar">
         <div className="toolbar-group">
-          <span className="toolbar-label">Priority</span>
-          <div className="pill-group" role="group" aria-label="Filter by priority">
-            {PRIORITY_FILTERS.map((p) => {
-              const active = priority === p;
-              return (
-                <button
-                  key={p ?? 'all'}
-                  type="button"
-                  className={`pill${active ? ' is-active' : ''}${p ? ` pill--${p}` : ''}`}
-                  aria-pressed={active}
-                  onClick={() => changePriority(p)}
-                >
-                  {p && <span className={`pill-dot pill-dot--${p}`} />}
-                  {p ? PRIORITY_LABELS[p] : 'All'}
-                </button>
-              );
-            })}
-          </div>
+          <label className="toolbar-label" htmlFor="filter-priority">Priority</label>
+          <span className="select-wrap select-wrap--with-dot">
+            <span className={`select-dot select-dot--${priority ?? 'all'}`} aria-hidden="true" />
+            <select
+              id="filter-priority"
+              value={priority ?? 'all'}
+              onChange={(e) =>
+                changePriority(
+                  e.target.value === 'all'
+                    ? undefined
+                    : (e.target.value as TaskPriority)
+                )
+              }
+            >
+              <option value="all">All</option>
+              {PRIORITY_OPTIONS.map((p) => (
+                <option key={p} value={p}>
+                  {PRIORITY_LABELS[p]}
+                </option>
+              ))}
+            </select>
+          </span>
         </div>
 
         <div className="toolbar-group">
