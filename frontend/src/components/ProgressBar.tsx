@@ -15,12 +15,13 @@ function taskProgress(node: TaskNode): number {
 
 export default function ProgressBar({ node }: { node: TaskNode }) {
   const pct = taskProgress(node);
+  const isDone = pct === 100;
   return (
     <div className="progress">
       <div className="track">
-        <div className={`fill${pct === 100 ? ' fill--done' : ''}`} style={{ width: `${pct}%` }} />
+        <div className={`fill${isDone ? ' fill--done' : ''}`} style={{ width: `${pct}%` }} />
       </div>
-      <span className="pct">{pct}%</span>
+      <span className={`pct${isDone ? ' pct--done' : ''}`}>{pct}%</span>
     </div>
   );
 }

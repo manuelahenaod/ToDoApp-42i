@@ -1,32 +1,41 @@
 .progress {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 10px;
+  gap: 10px;
+  margin-top: 12px;
 }
 
 .track {
   flex: 1;
   height: 6px;
   background: var(--color-surface);
-  border-radius: 99px;
+  border-radius: var(--radius-full);
   overflow: hidden;
+  position: relative;
 }
 
 .fill {
   height: 100%;
-  background: var(--color-primary);
-  border-radius: 99px;
-  transition: width 0.3s ease;
+  background: linear-gradient(90deg, #4F46E5 0%, #6366F1 100%);
+  border-radius: var(--radius-full);
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.fill--done { background: var(--green); }
+.fill--done {
+  background: linear-gradient(90deg, #0D9488 0%, #10B981 50%, #34D399 100%);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.35);
+}
 
 .pct {
   font-family: var(--headings);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 11px;
-  min-width: 32px;
+  min-width: 34px;
   text-align: right;
-  color: var(--color-ink-2);
+  color: var(--color-muted);
+  transition: color 0.2s ease;
+}
+
+.pct--done {
+  color: var(--done-text);
 }

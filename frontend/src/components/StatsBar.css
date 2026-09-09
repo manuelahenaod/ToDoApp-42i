@@ -135,5 +135,5 @@
 }
 
 .seg--todo { background: var(--color-muted-2); }
-.seg--progress { background: var(--color-primary); }
-.seg--done { background: var(--green); }
+.seg--progress { background: linear-gradient(90deg, #4F46E5 0%, #6366F1 100%); }
+.seg--done { background: linear-gradient(90deg, #0D9488 0%, #10B981 50%, #34D399 100%); }
