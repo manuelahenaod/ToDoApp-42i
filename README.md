@@ -217,10 +217,12 @@ curl -X POST http://localhost:8080/api/tasks \
 
 ## AI usage
 
-This project was developed with the help of a coding agent. The agent
-configuration, workflow and key technical decisions are documented in
-[`AGENTS.md`](./AGENTS.md) (mode, model and review responsibilities). All code
-went through review and automated tests.
+This project was developed with [opencode](https://opencode.ai), using the
+`opencode/big-pickle` model in a paired workflow. [`AGENTS.md`](./AGENTS.md)
+contains the instructions and key technical decisions the agent was given and
+followed during development; the agent config lives in
+`.opencode/opencode.json`. All code went through human review and automated
+tests before every commit.
 
 ---
 
