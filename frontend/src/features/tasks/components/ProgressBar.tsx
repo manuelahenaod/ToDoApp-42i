@@ -1,5 +1,6 @@
 import { taskProgress } from '../utils/taskProgress';
 import type { TaskNode } from '../types/task';
+import './ProgressBar.css';
 
 export default function ProgressBar({ node }: { node: TaskNode }) {
   const pct = taskProgress(node);
