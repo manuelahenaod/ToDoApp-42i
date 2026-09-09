@@ -1,5 +1,6 @@
-import pool from '../db/pool';
-import { NotFoundError, ValidationError } from './errors';
+import { NotFoundError, ValidationError } from '../errors/http-errors';
+import { taskRepository } from '../repositories/tasks.repository';
+import type { FieldValuePair } from '../repositories/tasks.repository';
 import type {
   CreateTaskInput,
   EffortStats,
@@ -36,21 +37,13 @@ export interface ListTasksResult {
 
 // ---------- validation ----------
 
-export function parseId(raw: string): number {
-  const id = Number(raw);
-  if (!Number.isInteger(id) || id <= 0) {
-    throw new ValidationError('Invalid task id');
-  }
-  return id;
-}
-
 export const MAX_TITLE_LENGTH = 255;
 
 function capitalizeFirst(value: string): string {
   return value.charAt(0).toLocaleUpperCase() + value.slice(1);
 }
 
-function validateTitle(title?: string): string {
+export function validateTitle(title?: string): string {
   if (title === undefined) {
     throw new ValidationError('title is required');
   }
@@ -64,7 +57,7 @@ function validateTitle(title?: string): string {
   return capitalizeFirst(trimmed);
 }
 
-function validateEffort(effort?: number | null): number | null | undefined {
+export function validateEffort(effort?: number | null): number | null | undefined {
   if (effort === undefined || effort === null) return effort;
   if (typeof effort !== 'number' || !Number.isInteger(effort) || effort < 0) {
     throw new ValidationError('effort_estimate must be a non-negative integer');
@@ -72,7 +65,7 @@ function validateEffort(effort?: number | null): number | null | undefined {
   return effort;
 }
 
-function validateStatus(status?: TaskStatus): TaskStatus | undefined {
+export function validateStatus(status?: TaskStatus): TaskStatus | undefined {
   if (status === undefined) return undefined;
   if (!VALID_STATUSES.includes(status)) {
     throw new ValidationError(`status must be one of: ${VALID_STATUSES.join(', ')}`);
@@ -80,7 +73,7 @@ function validateStatus(status?: TaskStatus): TaskStatus | undefined {
   return status;
 }
 
-function validatePriority(priority?: TaskPriority): TaskPriority | undefined {
+export function validatePriority(priority?: TaskPriority): TaskPriority | undefined {
   if (priority === undefined) return undefined;
   if (!VALID_PRIORITIES.includes(priority)) {
     throw new ValidationError(`priority must be one of: ${VALID_PRIORITIES.join(', ')}`);
@@ -104,23 +97,29 @@ function validateSortOrder(order?: TaskSortOrder): TaskSortOrder | undefined {
   return order;
 }
 
-async function requireTask(id: number): Promise<Task> {
-  const { rows } = await pool.query('SELECT * FROM tasks WHERE id = $1', [id]);
-  if (rows.length === 0) {
-    throw new NotFoundError('Task not found');
+// Rejects moving a task under itself or any of its descendants (would create a cycle)
+export function assertNoCyclicParent(
+  tasks: Pick<Task, 'id' | 'parent_id'>[],
+  taskId: number,
+  newParentId: number
+): void {
+  const byId = new Map(tasks.map((task) => [task.id, task]));
+  let cursor = byId.get(newParentId);
+  if (!cursor) throw new NotFoundError('parent task not found');
+  while (cursor) {
+    if (cursor.id === taskId) {
+      throw new ValidationError('cannot set parent to itself or a descendant');
+    }
+    cursor = cursor.parent_id !== null ? byId.get(cursor.parent_id) : undefined;
   }
-  return rows[0];
 }
 
-// Leaf-only rule: if a task has children, it loses its own effort (only leaves count)
-async function clearEffortIfHasChildren(taskIds: number[]): Promise<void> {
-  for (const id of taskIds) {
-    await pool.query(
-      `UPDATE tasks SET effort_estimate = NULL
-       WHERE id = $1 AND EXISTS (SELECT 1 FROM tasks WHERE parent_id = $1)`,
-      [id]
-    );
+async function requireTask(id: number): Promise<Task> {
+  const task = await taskRepository.findById(id);
+  if (!task) {
+    throw new NotFoundError('Task not found');
   }
+  return task;
 }
 
 // ---------- pure helpers (unit-testable without a DB) ----------
@@ -304,22 +303,16 @@ export async function createTask(input: CreateTaskInput): Promise<Task> {
     await requireTask(parentId);
   }
 
-  const { rows } = await pool.query(
-    `INSERT INTO tasks (title, description, status, priority, effort_estimate, parent_id)
-     VALUES ($1, $2, $3, $4, $5, $6)
-     RETURNING *`,
-    [
-      title,
-      input.description ?? '',
-      'todo',
-      priority ?? 'medium',
-      effort ?? null,
-      parentId,
-    ]
-  );
+  const task = await taskRepository.insert({
+    title,
+    description: input.description ?? '',
+    status: 'todo',
+    priority: priority ?? 'medium',
+    effort_estimate: effort ?? null,
+    parent_id: parentId,
+  });
 
-  const task = rows[0];
-  if (parentId !== null) await clearEffortIfHasChildren([parentId]);
+  if (parentId !== null) await taskRepository.clearEffortIfHasChildren([parentId]);
   return task;
 }
 
@@ -333,7 +326,7 @@ export async function createSubtask(
 
 export async function getTask(id: number): Promise<TaskDetail> {
   await requireTask(id);
-  const { rows } = await pool.query('SELECT * FROM tasks');
+  const rows = await taskRepository.findAll();
 
   const byId = new Map<number, Task>();
   for (const row of rows) byId.set(row.id, row);
@@ -354,77 +347,52 @@ export async function getTask(id: number): Promise<TaskDetail> {
 }
 
 export async function listTasks(filters?: ListTasksFilters): Promise<ListTasksResult> {
-  const { rows } = await pool.query('SELECT * FROM tasks');
+  const rows = await taskRepository.findAll();
   return prepareTaskList(rows, filters);
 }
 
 export async function updateTask(id: number, input: UpdateTaskInput): Promise<Task> {
   await requireTask(id);
 
-  const fields: string[] = [];
-  const values: unknown[] = [];
-  const param = () => `$${values.length + 1}`;
+  const fields: FieldValuePair[] = [];
 
   if (input.title !== undefined) {
-    fields.push(`title = ${param()}`);
-    values.push(validateTitle(input.title));
+    fields.push({ column: 'title', value: validateTitle(input.title) });
   }
   if (input.description !== undefined) {
-    fields.push(`description = ${param()}`);
-    values.push(input.description);
+    fields.push({ column: 'description', value: input.description });
   }
   if (input.status !== undefined) {
-    const { rows: childRows } = await pool.query('SELECT 1 FROM tasks WHERE parent_id = $1 LIMIT 1', [id]);
-    if (childRows.length > 0) {
+    if (await taskRepository.hasChildren(id)) {
       throw new ValidationError('cannot change the status of a task that has subtasks');
     }
-    fields.push(`status = ${param()}`);
-    values.push(validateStatus(input.status));
+    fields.push({ column: 'status', value: validateStatus(input.status) });
   }
   if (input.priority !== undefined) {
-    fields.push(`priority = ${param()}`);
-    values.push(validatePriority(input.priority));
+    fields.push({ column: 'priority', value: validatePriority(input.priority) });
   }
   if (input.effort_estimate !== undefined) {
-    fields.push(`effort_estimate = ${param()}`);
-    values.push(validateEffort(input.effort_estimate));
+    fields.push({ column: 'effort_estimate', value: validateEffort(input.effort_estimate) });
   }
   if (input.parent_id !== undefined) {
     const newParent = input.parent_id;
     if (newParent !== null) {
-      const { rows } = await pool.query('SELECT id, parent_id FROM tasks');
-      const byId = new Map(rows.map((r: { id: number;  parent_id: number | null }) => [r.id, r]));
-      let cursor = byId.get(newParent);
-      if (!cursor) throw new NotFoundError('parent task not found');
-      while (cursor) {
-        if (cursor.id === id) {
-          throw new ValidationError('cannot set parent to itself or a descendant');
-        }
-        cursor =
-          cursor.parent_id !== null ? byId.get(cursor.parent_id) : undefined;
-      }
+      assertNoCyclicParent(await taskRepository.findIdAndParents(), id, newParent);
     }
-    fields.push(`parent_id = ${param()}`);
-    values.push(newParent);
+    fields.push({ column: 'parent_id', value: newParent });
   }
 
-  if (fields.length === 0) return requireTask(id);
+  const task = await taskRepository.update(id, fields);
+  if (!task) throw new NotFoundError('Task not found');
 
-  const { rows } = await pool.query(
-    `UPDATE tasks SET ${fields.join(', ')}, updated_at = NOW()
-     WHERE id = ${param()} RETURNING *`,
-    [...values, id]
-  );
-
-  const task = rows[0];
   const gainedChildren = [id, task.parent_id].filter((v): v is number => v !== null);
-  await clearEffortIfHasChildren(gainedChildren);
+  await taskRepository.clearEffortIfHasChildren(gainedChildren);
   return task;
 }
 
 export async function deleteTask(id: number): Promise<void> {
-  const { rowCount } = await pool.query('DELETE FROM tasks WHERE id = $1', [id]);
-  if (rowCount === 0) {
+  const deleted = await taskRepository.delete(id);
+  if (!deleted) {
     throw new NotFoundError('Task not found');
   }
 }

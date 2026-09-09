@@ -2,8 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import pool from './db/pool';
 import migrate from './db/migrate';
-import taskRoutes from './routes/tasks';
-import statsRoutes from './routes/stats';
+import taskRoutes from './routes/tasks.route';
+import statsRoutes from './routes/stats.route';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
