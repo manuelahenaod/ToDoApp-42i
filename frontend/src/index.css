@@ -1,9 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Brand Corporate Colors */
-  --color-primary:         #4F46E5;
-  --color-primary-hover:   #4338CA;
+  /* Brand Corporate Colors - Electric Tech Blue */
+  --color-primary:         #6366F1;
+  --color-primary-hover:   #4F46E5;
   --color-primary-light:   #EEF2FF;
   --color-primary-lighter: #E0E7FF;
 
@@ -21,7 +21,7 @@
 
   /* Status Colors */
   --todo-text: #475569;  --todo-bg: #F1F5F9;
-  --prog-text: #4338CA;  --prog-bg: #E0E7FF;
+  --prog-text: #4F46E5;  --prog-bg: #EEF2FF;
   --done-text: #047857;  --done-bg: #D1FAE5;
   --crit-text: #B91C1C;  --crit-bg: #FEE2E2;
 
