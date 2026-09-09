@@ -158,6 +158,123 @@
   outline-offset: 1px;
 }
 
+/* ============ DERIVED STATUS BADGE + POPOVER ============ */
+.status-pop {
+  position: relative;
+  display: inline-flex;
+}
+
+.status-derived {
+  cursor: pointer;
+  border: none;
+  padding-right: 20px;
+}
+
+.status-derived:hover {
+  filter: brightness(0.97);
+}
+
+.status-derived:focus-visible {
+  outline: 2px solid var(--color-primary-lighter);
+  outline-offset: 1px;
+}
+
+.status-derived-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  margin-left: 6px;
+  flex: none;
+}
+
+.status-popover {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  width: 280px;
+  z-index: 40;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  padding: 12px 14px;
+  animation: statusPop 0.15s ease;
+}
+
+.status-popover::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 26px;
+  width: 10px;
+  height: 10px;
+  background: var(--color-white);
+  border-left: 1px solid var(--color-border);
+  border-top: 1px solid var(--color-border);
+  transform: rotate(45deg);
+}
+
+.status-popover-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.status-popover-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--headings);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.status-popover-title svg {
+  flex: none;
+  color: var(--color-primary);
+}
+
+.status-popover-close {
+  border: none;
+  background: var(--color-surface);
+  color: var(--color-muted);
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 11px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.status-popover-close:hover {
+  background: var(--color-border);
+  color: var(--color-ink);
+}
+
+.status-popover-body {
+  margin-top: 8px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--color-muted);
+}
+
+.status-popover-body strong {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+@keyframes statusPop {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .detail-actions {
   display: flex;
   gap: 8px;
