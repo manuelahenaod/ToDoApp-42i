@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import type { TaskPriority, TaskStatus } from '../types';
 import * as taskService from '../services/tasks';
+import type { TaskSortKey, TaskSortOrder } from '../services/tasks';
 import { parseId } from '../services/tasks';
 
 const router = Router();
@@ -23,12 +24,16 @@ function queryString(value: unknown): string | undefined {
 router.get('/', asyncHandler(async (req, res) => {
   const status = queryString(req.query.status) as TaskStatus | undefined;
   const priority = queryString(req.query.priority) as TaskPriority | undefined;
+  const sort = queryString(req.query.sort) as TaskSortKey | undefined;
+  const order = queryString(req.query.order) as TaskSortOrder | undefined;
   const page = Number(queryString(req.query.page)) || 1;
   const limit = Number(queryString(req.query.limit)) || 50;
 
   const result = await taskService.listTasks({
     status,
     priority,
+    sort,
+    order,
     page,
     limit,
   });

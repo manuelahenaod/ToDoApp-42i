@@ -14,12 +14,19 @@ import type {
 
 const VALID_STATUSES: TaskStatus[] = ['todo', 'in_progress', 'done'];
 const VALID_PRIORITIES: TaskPriority[] = ['low', 'medium', 'high', 'critical'];
+const VALID_SORT_KEYS: TaskSortKey[] = ['title', 'status', 'priority', 'effort', 'created_at'];
+const VALID_SORT_ORDERS: TaskSortOrder[] = ['asc', 'desc'];
+
+export type TaskSortKey = 'title' | 'status' | 'priority' | 'effort' | 'created_at';
+export type TaskSortOrder = 'asc' | 'desc';
 
 export interface ListTasksFilters {
   status?: TaskStatus;
   priority?: TaskPriority;
   page?: number;
   limit?: number;
+  sort?: TaskSortKey;
+  order?: TaskSortOrder;
 }
 
 export interface ListTasksResult {
@@ -70,6 +77,22 @@ function validatePriority(priority?: TaskPriority): TaskPriority | undefined {
     throw new ValidationError(`priority must be one of: ${VALID_PRIORITIES.join(', ')}`);
   }
   return priority;
+}
+
+function validateSortKey(sort?: TaskSortKey): TaskSortKey | undefined {
+  if (sort === undefined) return undefined;
+  if (!VALID_SORT_KEYS.includes(sort)) {
+    throw new ValidationError(`sort must be one of: ${VALID_SORT_KEYS.join(', ')}`);
+  }
+  return sort;
+}
+
+function validateSortOrder(order?: TaskSortOrder): TaskSortOrder | undefined {
+  if (order === undefined) return undefined;
+  if (!VALID_SORT_ORDERS.includes(order)) {
+    throw new ValidationError(`order must be one of: ${VALID_SORT_ORDERS.join(', ')}`);
+  }
+  return order;
 }
 
 async function requireTask(id: number): Promise<Task> {
@@ -211,6 +234,8 @@ export function prepareTaskList(
 ): ListTasksResult {
   const status = validateStatus(filters.status);
   const priority = validatePriority(filters.priority);
+  const sort = validateSortKey(filters.sort);
+  const order = validateSortOrder(filters.order);
 
   const effort = eachSubtreeEffort(all);
   const roots = stampStatus(stampEffort(buildTree(all), effort));
@@ -219,12 +244,34 @@ export function prepareTaskList(
   if (status) filtered = filtered.filter((r) => r.status === status);
   if (priority) filtered = filtered.filter((r) => r.priority === priority);
 
+  const sortKey = sort ?? 'priority';
+  const sortOrder = order ?? 'asc';
   const rank: Record<TaskPriority, number> = { critical: 0, high: 1, medium: 2, low: 3 };
-  const byDate = (a: Task, b: Task) =>
+  const statusOrder: Record<TaskStatus, number> = { todo: 0, in_progress: 1, done: 2 };
+  const dir = sortOrder === 'desc' ? -1 : 1;
+  const byDate = (a: TaskNode, b: TaskNode) =>
     new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-  filtered.sort(
-    (a, b) => rank[a.priority] - rank[b.priority] || byDate(a, b)
-  );
+
+  const byKey = (a: TaskNode, b: TaskNode): number => {
+    switch (sortKey) {
+      case 'title':
+        return a.title.localeCompare(b.title);
+      case 'status':
+        return statusOrder[a.status] - statusOrder[b.status];
+      case 'effort':
+        return (a.total_effort ?? 0) - (b.total_effort ?? 0);
+      case 'created_at':
+        return byDate(a, b);
+      case 'priority':
+      default:
+        return rank[a.priority] - rank[b.priority];
+    }
+  };
+
+  filtered = [...filtered].sort((a, b) => {
+    const primary = byKey(a, b);
+    return primary !== 0 ? primary * dir : dir * byDate(a, b);
+  });
 
   const total = filtered.length;
   const page = Math.max(1, filters.page ?? 1);
