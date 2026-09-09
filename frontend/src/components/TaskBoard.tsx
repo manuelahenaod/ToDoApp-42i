@@ -111,7 +111,11 @@ export default function TaskBoard({ refreshKey, onAddSubtask }: TaskBoardProps) 
     resetLimits();
   };
 
-  const changeSort = (option: SortOption) => {
+  const activeSort = SORT_OPTIONS.find((o) => o.sort === sortKey && o.order === sortOrder);
+
+  const changeSortByKey = (key: string) => {
+    const option = SORT_OPTIONS.find((o) => o.key === key);
+    if (!option) return;
     setSortKey(option.sort);
     setSortOrder(option.order);
     resetLimits();
@@ -151,23 +155,20 @@ export default function TaskBoard({ refreshKey, onAddSubtask }: TaskBoardProps) 
         </div>
 
         <div className="toolbar-group">
-          <span className="toolbar-label">Sort</span>
-          <div className="pill-group" role="group" aria-label="Sort tasks">
-            {SORT_OPTIONS.map((opt) => {
-              const active = sortKey === opt.sort && sortOrder === opt.order;
-              return (
-                <button
-                  key={opt.key}
-                  type="button"
-                  className={`pill${active ? ' is-active' : ''}`}
-                  aria-pressed={active}
-                  onClick={() => changeSort(opt)}
-                >
+          <label className="toolbar-label" htmlFor="sort">Sort</label>
+          <span className="select-wrap">
+            <select
+              id="sort"
+              value={activeSort?.key ?? 'newest'}
+              onChange={(e) => changeSortByKey(e.target.value)}
+            >
+              {SORT_OPTIONS.map((opt) => (
+                <option key={opt.key} value={opt.key}>
                   {opt.label}
-                </button>
-              );
-            })}
-          </div>
+                </option>
+              ))}
+            </select>
+          </span>
         </div>
 
         {hasFilters && (
