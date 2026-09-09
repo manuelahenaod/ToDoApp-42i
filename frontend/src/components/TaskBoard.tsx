@@ -1,8 +1,25 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Layers, ChevronRight, Zap, CheckCircle2, CircleDot, Clock } from 'lucide-react';
+import {
+  CheckCircle2,
+  ChevronRight,
+  CircleDot,
+  Clock,
+  Layers,
+  Plus,
+  X,
+  Zap,
+} from 'lucide-react';
 import { listTasks } from '../api/task';
-import type { ListResult, TaskNode, TaskStatus } from '../types/task';
+import type {
+  ListResult,
+  SortOrder,
+  TaskNode,
+  TaskPriority,
+  TaskSortKey,
+  TaskStatus,
+} from '../types/task';
+import { PRIORITY_LABELS } from '../types/labels';
 import { PriorityTag } from './Badge';
 import ProgressBar from './ProgressBar';
 import './TaskBoard.css';
@@ -15,6 +32,29 @@ const COLUMNS: { id: TaskStatus; label: string; icon: typeof CircleDot }[] = [
 
 const INITIAL_LIMIT = 4;
 const STEP = 5;
+
+const PRIORITY_FILTERS: (TaskPriority | undefined)[] = [
+  undefined,
+  'critical',
+  'high',
+  'medium',
+  'low',
+];
+
+interface SortOption {
+  key: string;
+  label: string;
+  sort: TaskSortKey;
+  order: SortOrder;
+}
+
+const SORT_OPTIONS: SortOption[] = [
+  { key: 'newest', label: 'Newest', sort: 'created_at', order: 'desc' },
+  { key: 'oldest', label: 'Oldest', sort: 'created_at', order: 'asc' },
+  { key: 'title', label: 'Title A → Z', sort: 'title', order: 'asc' },
+  { key: 'priority', label: 'Priority', sort: 'priority', order: 'asc' },
+  { key: 'effort', label: 'Effort', sort: 'effort', order: 'desc' },
+];
 
 type ColumnState = { tasks: TaskNode[]; total: number };
 
@@ -35,12 +75,18 @@ export default function TaskBoard({ refreshKey, onAddSubtask }: TaskBoardProps) 
     in_progress: INITIAL_LIMIT,
     done: INITIAL_LIMIT,
   });
+  const [priority, setPriority] = useState<TaskPriority | undefined>();
+  const [sortKey, setSortKey] = useState<TaskSortKey>('created_at');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+
+  const resetLimits = () =>
+    setLimits({ todo: INITIAL_LIMIT, in_progress: INITIAL_LIMIT, done: INITIAL_LIMIT });
 
   useEffect(() => {
     let cancelled = false;
     Promise.all(
       COLUMNS.map(({ id }) =>
-        listTasks({ status: id, limit: limits[id], sort: 'created_at', order: 'desc' })
+        listTasks({ status: id, priority, limit: limits[id], sort: sortKey, order: sortOrder })
           .then((res: ListResult) => ({ status: id, tasks: res.tasks, total: res.total }))
           .catch(() => ({ status: id, tasks: [] as TaskNode[], total: 0 }))
       )
@@ -55,60 +101,132 @@ export default function TaskBoard({ refreshKey, onAddSubtask }: TaskBoardProps) 
     return () => {
       cancelled = true;
     };
-  }, [refreshKey, limits]);
+  }, [refreshKey, limits, priority, sortKey, sortOrder]);
 
   const loadMore = (status: TaskStatus) =>
     setLimits((l) => ({ ...l, [status]: l[status] + STEP }));
 
-  return (
-    <div className="board">
-      {COLUMNS.map(({ id, label, icon: StatusIcon }) => {
-        const column = columns[id];
-        const shown = limits[id];
-        const hasMore = column.total > shown;
-        const isExpanded = shown > INITIAL_LIMIT;
-        return (
-          <section key={id} className={`column column--${id}`}>
-            <header className="column-head">
-              <div className="column-head-left">
-                <span className={`status-icon icon--${id}`}>
-                  <StatusIcon size={14} />
-                </span>
-                <h2 className="column-title">{label}</h2>
-              </div>
-              <span className={`column-count count--${id}`}>{column.total}</span>
-            </header>
+  const changePriority = (value: TaskPriority | undefined) => {
+    setPriority(value);
+    resetLimits();
+  };
 
-            <div className="column-list">
-              {column.total === 0 && <p className="column-empty">No tasks yet.</p>}
-              {column.tasks.map((task) => (
-                <BoardCard
-                  key={task.id}
-                  node={task}
-                  onOpen={() => navigate(`/tasks/${task.id}`)}
-                  onAddSubtask={onAddSubtask}
-                />
-              ))}
-              {(hasMore || isExpanded) && (
-                <div className="column-actions">
-                  {hasMore && (
-                    <button type="button" className="load-more" onClick={() => loadMore(id)}>
-                      <Plus size={14} />
-                      <span>Load more</span>
-                    </button>
-                  )}
-                  {isExpanded && (
-                    <button type="button" className="show-less" onClick={() => setLimits((l) => ({ ...l, [id]: INITIAL_LIMIT }))}>
-                      Show less
-                    </button>
-                  )}
+  const changeSort = (option: SortOption) => {
+    setSortKey(option.sort);
+    setSortOrder(option.order);
+    resetLimits();
+  };
+
+  const hasFilters = priority !== undefined || sortKey !== 'created_at' || sortOrder !== 'desc';
+
+  const resetFilters = () => {
+    setPriority(undefined);
+    setSortKey('created_at');
+    setSortOrder('desc');
+    resetLimits();
+  };
+
+  return (
+    <>
+      <div className="board-toolbar">
+        <div className="toolbar-group">
+          <span className="toolbar-label">Priority</span>
+          <div className="pill-group" role="group" aria-label="Filter by priority">
+            {PRIORITY_FILTERS.map((p) => {
+              const active = priority === p;
+              return (
+                <button
+                  key={p ?? 'all'}
+                  type="button"
+                  className={`pill${active ? ' is-active' : ''}${p ? ` pill--${p}` : ''}`}
+                  aria-pressed={active}
+                  onClick={() => changePriority(p)}
+                >
+                  {p && <span className={`pill-dot pill-dot--${p}`} />}
+                  {p ? PRIORITY_LABELS[p] : 'All'}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="toolbar-group">
+          <span className="toolbar-label">Sort</span>
+          <div className="pill-group" role="group" aria-label="Sort tasks">
+            {SORT_OPTIONS.map((opt) => {
+              const active = sortKey === opt.sort && sortOrder === opt.order;
+              return (
+                <button
+                  key={opt.key}
+                  type="button"
+                  className={`pill${active ? ' is-active' : ''}`}
+                  aria-pressed={active}
+                  onClick={() => changeSort(opt)}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {hasFilters && (
+          <button type="button" className="clear-filters" onClick={resetFilters}>
+            <X size={12} />
+            Reset
+          </button>
+        )}
+      </div>
+
+      <div className="board">
+        {COLUMNS.map(({ id, label, icon: StatusIcon }) => {
+          const column = columns[id];
+          const shown = limits[id];
+          const hasMore = column.total > shown;
+          const isExpanded = shown > INITIAL_LIMIT;
+          return (
+            <section key={id} className={`column column--${id}`}>
+              <header className="column-head">
+                <div className="column-head-left">
+                  <span className={`status-icon icon--${id}`}>
+                    <StatusIcon size={14} />
+                  </span>
+                  <h2 className="column-title">{label}</h2>
                 </div>
-              )}
-            </div>
-          </section>
-        );
-      })}
-    </div>
+                <span className={`column-count count--${id}`}>{column.total}</span>
+              </header>
+
+              <div className="column-list">
+                {column.total === 0 && <p className="column-empty">No tasks yet.</p>}
+                {column.tasks.map((task) => (
+                  <BoardCard
+                    key={task.id}
+                    node={task}
+                    onOpen={() => navigate(`/tasks/${task.id}`)}
+                    onAddSubtask={onAddSubtask}
+                  />
+                ))}
+                {(hasMore || isExpanded) && (
+                  <div className="column-actions">
+                    {hasMore && (
+                      <button type="button" className="load-more" onClick={() => loadMore(id)}>
+                        <Plus size={14} />
+                        <span>Load more</span>
+                      </button>
+                    )}
+                    {isExpanded && (
+                      <button type="button" className="show-less" onClick={() => setLimits((l) => ({ ...l, [id]: INITIAL_LIMIT }))}>
+                        Show less
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </section>
+          );
+        })}
+      </div>
+    </>
   );
 }
 

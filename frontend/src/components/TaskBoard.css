@@ -286,3 +286,106 @@
   background: var(--color-white);
   color: var(--color-ink);
 }
+
+/* ============ TOOLBAR (PRIORITY FILTER + SORT) ============ */
+.board-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px 24px;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.toolbar-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.toolbar-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-muted);
+}
+
+.pill-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--inter);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-ink-2);
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.pill:hover {
+  border-color: var(--color-muted-2);
+  color: var(--color-ink);
+}
+
+.pill.is-active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+
+.pill.is-active.pill--critical { background: var(--prio-crit); border-color: var(--prio-crit); }
+.pill.is-active.pill--high { background: var(--prio-high); border-color: var(--prio-high); }
+.pill.is-active.pill--medium { background: var(--prio-med); border-color: var(--prio-med); }
+.pill.is-active.pill--low { background: var(--color-muted-2); border-color: var(--color-muted-2); }
+
+.pill-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+}
+
+.pill-dot--critical { background: var(--prio-crit); }
+.pill-dot--high { background: var(--prio-high); }
+.pill-dot--medium { background: var(--prio-med); }
+.pill-dot--low { background: var(--prio-low); }
+
+.clear-filters {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--inter);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-muted);
+  background: transparent;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-bottom: 2px;
+}
+
+.clear-filters:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
