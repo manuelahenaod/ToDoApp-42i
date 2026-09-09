@@ -155,3 +155,99 @@
   background: var(--color-surface);
   color: var(--color-ink);
 }
+
+/* Priority Segmented Button Selector */
+.field-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-ink-2);
+}
+
+.priority-selector {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+.prio-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
+  color: var(--color-ink-2);
+  font-family: var(--inter);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.prio-btn:hover {
+  border-color: var(--color-muted-2);
+  background: var(--color-surface);
+  transform: translateY(-1px);
+}
+
+.prio-btn-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.prio-btn--critical .prio-btn-dot { background: var(--prio-crit); }
+.prio-btn--high .prio-btn-dot { background: var(--prio-high); }
+.prio-btn--medium .prio-btn-dot { background: var(--prio-med); }
+.prio-btn--low .prio-btn-dot { background: var(--prio-low); }
+
+/* Selected Priority Button States */
+.prio-btn.is-selected {
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.prio-btn--critical.is-selected {
+  background: var(--prio-crit-bg);
+  color: var(--prio-crit-text);
+  border-color: var(--prio-crit);
+  box-shadow: 0 0 0 3px var(--prio-crit-bg);
+}
+
+.prio-btn--high.is-selected {
+  background: var(--prio-high-bg);
+  color: var(--prio-high-text);
+  border-color: var(--prio-high);
+  box-shadow: 0 0 0 3px var(--prio-high-bg);
+}
+
+.prio-btn--medium.is-selected {
+  background: var(--prio-med-bg);
+  color: var(--prio-med-text);
+  border-color: var(--prio-med);
+  box-shadow: 0 0 0 3px var(--prio-med-bg);
+}
+
+.prio-btn--low.is-selected {
+  background: var(--prio-low-bg);
+  color: var(--prio-low-text);
+  border-color: var(--prio-low);
+  box-shadow: 0 0 0 3px var(--prio-low-bg);
+}
+
+.prio-btn.is-selected .prio-btn-dot {
+  transform: scale(1.3);
+}
+
+@media (max-width: 400px) {
+  .priority-selector {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

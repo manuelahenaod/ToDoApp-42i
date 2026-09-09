@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
+  ArrowUpDown,
   CheckCircle2,
   ChevronRight,
   CircleDot,
   Clock,
   Layers,
   Plus,
-  X,
   Zap,
 } from 'lucide-react';
 import { listTasks } from '../api/task';
@@ -115,48 +115,40 @@ export default function TaskBoard({ refreshKey, onAddSubtask }: TaskBoardProps) 
     resetLimits();
   };
 
-  const hasFilters = priority !== undefined || sortKey !== 'created_at' || sortOrder !== 'desc';
-
-  const resetFilters = () => {
-    setPriority(undefined);
-    setSortKey('created_at');
-    setSortOrder('desc');
-    resetLimits();
-  };
-
   return (
     <>
       <div className="board-toolbar">
-        <div className="toolbar-group">
-          <label className="toolbar-label" htmlFor="filter-priority">Priority</label>
-          <span className="select-wrap select-wrap--with-dot">
-            <span className={`select-dot select-dot--${priority ?? 'all'}`} aria-hidden="true" />
-            <select
-              id="filter-priority"
-              value={priority ?? 'all'}
-              onChange={(e) =>
-                changePriority(
-                  e.target.value === 'all'
-                    ? undefined
-                    : (e.target.value as TaskPriority)
-                )
-              }
+        <div className="toolbar-section toolbar-section--pills">
+          <span className="toolbar-label">Priority</span>
+          <div className="priority-chips">
+            <button
+              type="button"
+              className={`prio-chip prio-chip--all ${priority === undefined ? 'is-active' : ''}`}
+              onClick={() => changePriority(undefined)}
             >
-              <option value="all">All</option>
-              {PRIORITY_OPTIONS.map((p) => (
-                <option key={p} value={p}>
-                  {PRIORITY_LABELS[p]}
-                </option>
-              ))}
-            </select>
-          </span>
+              All
+            </button>
+            {PRIORITY_OPTIONS.map((p) => (
+              <button
+                key={p}
+                type="button"
+                className={`prio-chip prio-chip--${p} ${priority === p ? 'is-active' : ''}`}
+                onClick={() => changePriority(p)}
+              >
+                <span className="prio-chip-dot" />
+                {PRIORITY_LABELS[p]}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="toolbar-group">
-          <label className="toolbar-label" htmlFor="sort">Sort</label>
-          <span className="select-wrap">
+        <div className="toolbar-section toolbar-section--sort">
+          <label className="toolbar-label" htmlFor="sort">Sort by</label>
+          <div className="sort-select-wrapper">
+            <ArrowUpDown size={14} className="sort-icon" />
             <select
               id="sort"
+              className="sort-select"
               value={activeSort?.key ?? 'newest'}
               onChange={(e) => changeSortByKey(e.target.value)}
             >
@@ -166,15 +158,8 @@ export default function TaskBoard({ refreshKey, onAddSubtask }: TaskBoardProps) 
                 </option>
               ))}
             </select>
-          </span>
+          </div>
         </div>
-
-        {hasFilters && (
-          <button type="button" className="clear-filters" onClick={resetFilters}>
-            <X size={12} />
-            Reset
-          </button>
-        )}
       </div>
 
       <div className="board">

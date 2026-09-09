@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { X } from 'lucide-react';
 import type { CreateTaskInput, TaskPriority } from '../types/task';
+import { PRIORITY_LABELS } from '../types/labels';
 import './TaskForm.css';
 
 interface TaskFormProps {
@@ -108,37 +109,46 @@ export default function TaskForm({
           />
         </label>
 
-        <div className="field-row">
-          <label className="field">
-            <span>Priority</span>
-            <select value={form.priority} onChange={(e) => set('priority', e.target.value as TaskPriority)}>
-              {PRIORITIES.map((p) => (
-                <option key={p} value={p}>
-                  {p.charAt(0).toUpperCase() + p.slice(1)}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className={`field${effortLocked ? ' field--locked' : ''}${effortError ? ' field--error' : ''}`}>
-            <span>Effort estimate</span>
-            <input
-              type="number"
-              min="0"
-              step="1"
-              value={form.effort}
-              onChange={(e) => set('effort', e.target.value)}
-              placeholder="e.g. 5"
-              disabled={effortLocked}
-              aria-invalid={effortError ? true : undefined}
-            />
-            {effortLocked ? (
-              <span className="field-hint">Effort is derived from its subtasks — edit a subtask to change it.</span>
-            ) : effortError ? (
-              <span className="field-error">{effortError}</span>
-            ) : null}
-          </label>
+        <div className="field">
+          <span className="field-title">Priority</span>
+          <div className="priority-selector" role="radiogroup" aria-label="Priority">
+            {PRIORITIES.map((p) => {
+              const isSelected = form.priority === p;
+              return (
+                <button
+                  key={p}
+                  type="button"
+                  role="radio"
+                  aria-checked={isSelected}
+                  className={`prio-btn prio-btn--${p} ${isSelected ? 'is-selected' : ''}`}
+                  onClick={() => set('priority', p)}
+                >
+                  <span className="prio-btn-dot" />
+                  <span>{PRIORITY_LABELS[p]}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
+
+        <label className={`field${effortLocked ? ' field--locked' : ''}${effortError ? ' field--error' : ''}`}>
+          <span>Effort estimate</span>
+          <input
+            type="number"
+            min="0"
+            step="1"
+            value={form.effort}
+            onChange={(e) => set('effort', e.target.value)}
+            placeholder="e.g. 5"
+            disabled={effortLocked}
+            aria-invalid={effortError ? true : undefined}
+          />
+          {effortLocked ? (
+            <span className="field-hint">Effort is derived from its subtasks — edit a subtask to change it.</span>
+          ) : effortError ? (
+            <span className="field-error">{effortError}</span>
+          ) : null}
+        </label>
 
         {error && <div className="form-error">{error}</div>}
 

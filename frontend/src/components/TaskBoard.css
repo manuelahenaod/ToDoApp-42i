@@ -291,21 +291,23 @@
 .board-toolbar {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 14px 24px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px 20px;
   background: var(--color-white);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: 12px 14px;
+  border-radius: var(--radius-lg);
+  padding: 12px 16px;
   box-shadow: var(--shadow-sm);
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   width: 100%;
 }
 
-.toolbar-group {
+.toolbar-section {
   display: flex;
-  flex-direction: column;
-  gap: 7px;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .toolbar-label {
@@ -314,43 +316,130 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--color-muted);
+  white-space: nowrap;
 }
 
-.select-wrap {
+/* Priority Pills */
+.priority-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.prio-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--inter);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-ink-2);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.prio-chip:hover {
+  border-color: var(--color-muted-2);
+  background: var(--color-white);
+  transform: translateY(-1px);
+}
+
+.prio-chip-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  background: var(--color-muted-2);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.prio-chip--critical .prio-chip-dot { background: var(--prio-crit); }
+.prio-chip--high .prio-chip-dot { background: var(--prio-high); }
+.prio-chip--medium .prio-chip-dot { background: var(--prio-med); }
+.prio-chip--low .prio-chip-dot { background: var(--prio-low); }
+
+/* Active States for Priority Chips */
+.prio-chip.is-active {
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.prio-chip--all.is-active {
+  background: var(--color-ink);
+  color: var(--color-white);
+  border-color: var(--color-ink);
+}
+
+.prio-chip--critical.is-active {
+  background: var(--prio-crit-bg);
+  color: var(--prio-crit-text);
+  border-color: var(--prio-crit);
+}
+
+.prio-chip--high.is-active {
+  background: var(--prio-high-bg);
+  color: var(--prio-high-text);
+  border-color: var(--prio-high);
+}
+
+.prio-chip--medium.is-active {
+  background: var(--prio-med-bg);
+  color: var(--prio-med-text);
+  border-color: var(--prio-med);
+}
+
+.prio-chip--low.is-active {
+  background: var(--prio-low-bg);
+  color: var(--prio-low-text);
+  border-color: var(--prio-low);
+}
+
+.prio-chip.is-active .prio-chip-dot {
+  transform: scale(1.2);
+}
+
+/* Sort Select Wrapper */
+.sort-select-wrapper {
   position: relative;
   display: inline-flex;
   align-items: center;
 }
 
-.select-wrap select {
+.sort-icon {
+  position: absolute;
+  left: 11px;
+  color: var(--color-muted);
+  pointer-events: none;
+  z-index: 1;
+  transition: color 0.15s ease;
+}
+
+.sort-select {
   appearance: none;
   -webkit-appearance: none;
   font-family: var(--inter);
   font-size: 13px;
   font-weight: 600;
   color: var(--color-ink);
-  background: var(--color-white);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: 7px 30px 7px 10px;
+  border-radius: var(--radius-full);
+  padding: 6px 32px 6px 32px;
   cursor: pointer;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: all 0.2s ease;
 }
 
-.select-wrap select:hover {
-  border-color: var(--color-muted-2);
-}
-
-.select-wrap select:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-lighter);
-}
-
-.select-wrap::after {
+.sort-select-wrapper::after {
   content: '';
   position: absolute;
-  right: 11px;
+  right: 12px;
   width: 0;
   height: 0;
   pointer-events: none;
@@ -359,45 +448,18 @@
   border-top: 5px solid var(--color-muted-2);
 }
 
-.select-wrap--with-dot select {
-  padding-left: 26px;
+.sort-select:hover {
+  background: var(--color-white);
+  border-color: var(--color-muted-2);
 }
 
-.select-dot {
-  position: absolute;
-  left: 9px;
-  width: 7px;
-  height: 7px;
-  border-radius: var(--radius-full);
-  background: var(--color-muted-2);
-  pointer-events: none;
-  z-index: 1;
-}
-
-.select-dot--critical { background: var(--prio-crit); }
-.select-dot--high { background: var(--prio-high); }
-.select-dot--medium { background: var(--prio-med); }
-.select-dot--low { background: var(--prio-low); }
-
-.clear-filters {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-family: var(--inter);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--color-muted);
-  background: transparent;
-  border: 1px dashed var(--color-border);
-  border-radius: var(--radius-full);
-  padding: 6px 12px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  margin-bottom: 2px;
-}
-
-.clear-filters:hover {
-  color: var(--color-primary);
+.sort-select:focus {
+  outline: none;
   border-color: var(--color-primary);
-  background: var(--color-primary-light);
+  box-shadow: 0 0 0 3px var(--color-primary-lighter);
+  background: var(--color-white);
+}
+
+.sort-select-wrapper:hover .sort-icon {
+  color: var(--color-primary);
 }
