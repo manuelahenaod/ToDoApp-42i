@@ -1,14 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, ChevronDown, ChevronRight, Info, Pencil, Plus, Trash2, Zap } from 'lucide-react';
+import { ArrowLeft, Pencil, Trash2, Zap } from 'lucide-react';
 import { useTask } from '../features/tasks/hooks/useTask';
 import { useTaskMutations } from '../features/tasks/hooks/useTaskMutations';
 import { PriorityBadge } from '../features/tasks/components/Badge';
-import { STATUS_LABELS } from '../features/tasks/types/labels';
 import ProgressBar from '../features/tasks/components/ProgressBar';
 import TaskForm from '../features/tasks/components/TaskForm';
+import TaskBreadcrumbs from '../features/tasks/components/TaskBreadcrumbs';
+import EffortBreakdown from '../features/tasks/components/EffortBreakdown';
+import SubtreeList from '../features/tasks/components/SubtreeList';
+import TaskStatusSelector from '../features/tasks/components/TaskStatusSelector';
 import ConfirmModal from '../shared/ui/ConfirmModal';
-import type { TaskNode, TaskStatus } from '../features/tasks/types/task';
+import type { TaskStatus } from '../features/tasks/types/task';
 import './TaskDetailPage.css';
 
 function formatDate(value: string): string {
@@ -89,17 +92,7 @@ export default function TaskDetailPage() {
         </Link>
       )}
 
-      {task.parents.length > 0 && (
-        <nav className="breadcrumbs" aria-label="Breadcrumb">
-          {task.parents.map((parent) => (
-            <span className="crumb" key={parent.id}>
-              <Link to={`/tasks/${parent.id}`}>{parent.title}</Link>
-              <ChevronRight size={12} className="crumb-sep" />
-            </span>
-          ))}
-          <span className="crumb crumb--current">{task.title}</span>
-        </nav>
-      )}
+      <TaskBreadcrumbs parents={task.parents} current={task.title} />
 
       <section className="detail-card">
         <div className="detail-head">
@@ -119,7 +112,7 @@ export default function TaskDetailPage() {
           </div>
 
           <div className="detail-badges">
-            <StateBadge status={task.status} hasSubtasks={hasSubtasks} subtaskCount={task.subtasks.length} onChange={handleStatusChange} />
+            <TaskStatusSelector status={task.status} hasSubtasks={hasSubtasks} subtaskCount={task.subtasks.length} onChange={handleStatusChange} />
             <PriorityBadge priority={task.priority} />
           </div>
 
@@ -137,44 +130,10 @@ export default function TaskDetailPage() {
 
         <ProgressBar node={task} />
 
-        <div className="detail-effort">
-          <div className="effort-block">
-            <span className="effort-label">Total effort</span>
-            <span className="effort-value"><Zap size={14} /> {task.effort.total}</span>
-          </div>
-          <div className="effort-block effort-block--todo">
-            <span className="effort-label">Effort to do</span>
-            <span className="effort-value"><Zap size={14} /> {task.effort.todo}</span>
-          </div>
-          <div className="effort-block effort-block--prog">
-            <span className="effort-label">Effort in progress</span>
-            <span className="effort-value"><Zap size={14} /> {task.effort.in_progress}</span>
-          </div>
-          <div className="effort-block effort-block--done">
-            <span className="effort-label">Effort completed</span>
-            <span className="effort-value"><Zap size={14} /> {task.effort.done}</span>
-          </div>
-        </div>
+        <EffortBreakdown effort={task.effort} />
       </section>
 
-      <section className="detail-card">
-        <div className="subtree-head">
-          <h3>
-            Subtasks <span className="subtree-count">({task.subtasks.length})</span>
-          </h3>
-          <button type="button" className="add-btn" onClick={() => setSubtaskOpen(true)}>
-            <Plus size={15} /> Add subtask
-          </button>
-        </div>
-
-        {task.subtasks.length === 0 ? (
-          <p className="subtree-empty">No subtasks yet.</p>
-        ) : (
-          <div className="subtree">
-            <SubtreeNode node={task} />
-          </div>
-        )}
-      </section>
+      <SubtreeList node={task} onAddSubtask={() => setSubtaskOpen(true)} />
 
       {editOpen && (
         <TaskForm
@@ -222,109 +181,3 @@ export default function TaskDetailPage() {
   );
 }
 
-interface StateBadgeProps {
-  status: TaskStatus;
-  hasSubtasks: boolean;
-  subtaskCount: number;
-  onChange: (status: TaskStatus) => void;
-}
-
-function StateBadge({ status, hasSubtasks, subtaskCount, onChange }: StateBadgeProps) {
-  if (hasSubtasks) {
-    return <DerivedStatusBadge status={status} subtaskCount={subtaskCount} />;
-  }
-  return (
-    <label className={`status-pill status-pill--${status}`}>
-      <select
-        className={`badge badge--${status} status-select`}
-        value={status}
-        aria-label="Change status"
-        onChange={(e) => onChange(e.target.value as TaskStatus)}
-      >
-        {Object.entries(STATUS_LABELS).map(([value, label]) => (
-          <option key={value} value={value}>
-            {label}
-          </option>
-        ))}
-      </select>
-      <ChevronDown size={12} className="status-caret" />
-    </label>
-  );
-}
-
-function DerivedStatusBadge({ status, subtaskCount }: { status: TaskStatus; subtaskCount: number }) {
-  const [open, setOpen] = useState(false);
-  const wrapRef = useRef<HTMLSpanElement>(null);
-
-  useEffect(() => {
-    function onPointerDown(event: MouseEvent) {
-      if (wrapRef.current && !wrapRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    }
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') setOpen(false);
-    }
-    document.addEventListener('mousedown', onPointerDown);
-    document.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.removeEventListener('mousedown', onPointerDown);
-      document.removeEventListener('keydown', onKeyDown);
-    };
-  }, []);
-
-  return (
-    <span className="status-pop" ref={wrapRef}>
-      <button
-        type="button"
-        className={`badge badge--${status} status-derived`}
-        aria-haspopup="true"
-        aria-expanded={open}
-        onClick={() => setOpen((value) => !value)}
-      >
-        {STATUS_LABELS[status]}
-        <span className="status-derived-dot" />
-      </button>
-      {open && (
-        <div className="status-popover" role="tooltip">
-          <div className="status-popover-head">
-            <span className="status-popover-title">
-              <Info size={13} />
-              Derived status
-            </span>
-            <button type="button" className="status-popover-close" aria-label="Dismiss" onClick={() => setOpen(false)}>
-              ✕
-            </button>
-          </div>
-          <p className="status-popover-body">
-            This status is calculated from its <strong>{subtaskCount}</strong>{' '}
-            subtask{subtaskCount === 1 ? '' : 's'}. Complete the subtasks or change their status to update it.
-          </p>
-        </div>
-      )}
-    </span>
-  );
-}
-
-function SubtreeNode({ node, depth = 0 }: { node: TaskNode; depth?: number }) {
-  const children = Array.isArray(node.subtasks) ? node.subtasks : [];
-  if (depth > 2) return null;
-  return (
-    <div className="subtree-group">
-      {children.map((child) => (
-        <div key={child.id}>
-          <Link className={`task-row task-row--depth-${depth}`} to={`/tasks/${child.id}`}>
-            <span className={`status-dot status-dot--${child.status}`} />
-            <span className={`row-title${child.status === 'done' ? ' row-title--done' : ''}`}>{child.title}</span>
-            {depth === 2 && child.subtasks.length > 0 && (
-              <span className="task-dots" aria-label="Open subtasks" title="Open subtasks">⋯</span>
-            )}
-            <span className="row-effort"><Zap size={11} /> {child.total_effort ?? 0}</span>
-            <ChevronRight size={15} className="row-chevron" />
-          </Link>
-          <SubtreeNode node={child} depth={depth + 1} />
-        </div>
-      ))}
-    </div>
-  );
-}
