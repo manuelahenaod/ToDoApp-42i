@@ -37,6 +37,12 @@
   font-weight: 700;
   font-family: var(--headings);
   color: var(--color-ink);
+  flex: 1;
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .modal-close {

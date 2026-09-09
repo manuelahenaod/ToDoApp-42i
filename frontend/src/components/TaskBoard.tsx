@@ -229,7 +229,7 @@ function BoardCard({
   return (
     <article className={`card card--prio-${node.priority}${isDone ? ' card--done' : ''}`} onClick={onOpen}>
       <div className="card-top">
-        <h3 className="card-title">{node.title}</h3>
+        <h3 className="card-title" title={node.title}>{node.title}</h3>
         <PriorityTag priority={node.priority} />
       </div>
 

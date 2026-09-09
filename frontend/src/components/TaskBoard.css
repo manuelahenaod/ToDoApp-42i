@@ -25,6 +25,7 @@
   flex-direction: column;
   gap: 12px;
   width: 100%;
+  min-width: 0;
   box-sizing: border-box;
 }
 
@@ -86,6 +87,7 @@
   flex-direction: column;
   gap: 12px;
   flex: 1;
+  min-width: 0;
 }
 
 .column-empty {
@@ -151,6 +153,10 @@
   color: var(--color-ink);
   line-height: 1.4;
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .card--done .card-title {
